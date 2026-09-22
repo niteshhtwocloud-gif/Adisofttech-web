@@ -15,6 +15,18 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async rewrites() {
+    return [
+      {
+        source: "/admin",
+        destination: "http://localhost:3001/admin",
+      },
+      {
+        source: "/admin/:path*",
+        destination: "http://localhost:3001/admin/:path*",
+      },
+    ];
+  },
 };
 
 export default nextConfig;

@@ -122,16 +122,14 @@ export default function AdminSidebar({ isOpen = false, onClose }: AdminSidebarPr
       {/* Bottom Footer Area */}
       <div className="border-t border-slate-200/80 p-3 space-y-1 bg-slate-50/50">
         <a
-          href="http://localhost:3000"
-          target="_blank"
-          rel="noopener noreferrer"
+          href="/"
           className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-medium text-slate-600 transition-colors hover:bg-white hover:text-slate-900 border border-transparent hover:border-slate-200/80"
         >
           <span className="flex items-center gap-2">
             <ExternalLink className="h-3.5 w-3.5 text-slate-400" />
             <span>View Public Site</span>
           </span>
-          <span className="rounded bg-slate-200/80 px-1.5 py-0.5 text-[10px] text-slate-600">:3000</span>
+          <span className="rounded bg-slate-200/80 px-1.5 py-0.5 text-[10px] text-slate-600">Website</span>
         </a>
 
         <button

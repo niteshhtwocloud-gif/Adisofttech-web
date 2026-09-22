@@ -34,7 +34,7 @@ class AdminApiClient {
     if (typeof window !== "undefined") {
       localStorage.removeItem("ast_admin_token");
       localStorage.removeItem("ast_admin_user");
-      window.location.href = "/login";
+      window.location.href = "/admin/login";
     }
   }
 
