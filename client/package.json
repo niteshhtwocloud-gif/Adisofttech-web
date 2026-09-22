@@ -1,0 +1,15 @@
+{
+  "//": "Frontend orchestration for AdiSofTech website (3000) and admin (3001).",
+  "name": "adisofttech-client",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "node dev.js",
+    "dev:website": "npm --prefix website run dev",
+    "dev:admin": "npm --prefix admin run dev",
+    "build": "npm --prefix website run build && npm --prefix admin run build",
+    "build:website": "npm --prefix website run build",
+    "build:admin": "npm --prefix admin run build"
+  }
+}
