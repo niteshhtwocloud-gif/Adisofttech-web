@@ -20,17 +20,17 @@ const settingsSchema = new mongoose.Schema(
     },
     supportEmail: {
       type: String,
-      default: "contact@adisofttech.com",
+      default: "adisofttech22@gmail.com",
       trim: true,
     },
     phone: {
       type: String,
-      default: "+91 98765 43210",
+      default: "+91 98317 18493",
       trim: true,
     },
     address: {
       type: String,
-      default: "Plot No. 42, Cyber City, Gurugram, Haryana, India",
+      default: "West Bengal, India",
       trim: true,
     },
   },

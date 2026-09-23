@@ -13,6 +13,8 @@ import {
   ShieldCheck,
   Send,
   MessageSquare,
+  X,
+  Copy,
 } from "lucide-react";
 import CTA from "./CTA";
 
@@ -69,6 +71,18 @@ export default function Contact() {
   const turnstileContainerRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
 
+  // Direct Phone Support Modal state
+  const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false);
+  const [copiedPhone, setCopiedPhone] = useState(false);
+
+  const handleCopyPhone = () => {
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText("+919831718493");
+      setCopiedPhone(true);
+      setTimeout(() => setCopiedPhone(false), 2500);
+    }
+  };
+
   /**
    * Helper: Resets Turnstile widget state and clears token
    */
@@ -124,7 +138,7 @@ export default function Contact() {
         if (widgetIdRef.current) {
           try {
             window.turnstile.remove(widgetIdRef.current);
-          } catch (e) {}
+          } catch (e) { }
         }
 
         try {
@@ -185,7 +199,7 @@ export default function Contact() {
       if (widgetIdRef.current && typeof window !== "undefined" && window.turnstile) {
         try {
           window.turnstile.remove(widgetIdRef.current);
-        } catch (e) {}
+        } catch (e) { }
       }
     };
   }, []);
@@ -236,10 +250,10 @@ export default function Contact() {
   }
 
   return (
-    <section id="contact" className="relative bg-white pt-16 pb-20 sm:pt-20 sm:pb-24">
+    <section className="relative bg-white pt-16 pb-20 sm:pt-20 sm:pb-24">
       <CTA />
 
-      <div id="contact-form" className="mx-auto max-w-7xl px-5 pt-12 pb-6 sm:px-8 scroll-mt-24">
+      <div id="contact" className="mx-auto max-w-7xl px-5 pt-12 pb-6 sm:px-8 scroll-mt-24">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-14">
           {/* Left: Contact Info & Value Commitments */}
           <div className="lg:col-span-5">
@@ -260,7 +274,7 @@ export default function Contact() {
             {/* Direct Contact Points */}
             <div className="mt-8 space-y-4">
               <a
-                href="mailto:info@adisofttech.com"
+                href="mailto:adisofttech22@gmail.com"
                 className="group flex items-center gap-3.5 rounded-2xl border border-slate-200/80 bg-slate-50/60 p-3.5 transition hover:border-blue-300 hover:bg-white"
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-[#0b57d0] transition group-hover:bg-[#0b57d0] group-hover:text-white">
@@ -271,38 +285,45 @@ export default function Contact() {
                     Official Email
                   </div>
                   <div className="text-sm font-bold text-[#0f172a] group-hover:text-[#0b57d0]">
-                    info@adisofttech.com
+                    adisofttech22@gmail.com
                   </div>
                 </div>
               </a>
 
-              <a
-                href="tel:+919876543210"
-                className="group flex items-center gap-3.5 rounded-2xl border border-slate-200/80 bg-slate-50/60 p-3.5 transition hover:border-blue-300 hover:bg-white"
+              <button
+                type="button"
+                onClick={() => setIsPhoneModalOpen(true)}
+                className="group flex w-full items-center justify-between gap-3.5 rounded-2xl border border-slate-200/80 bg-slate-50/60 p-3.5 text-left transition hover:border-orange-300 hover:bg-white"
               >
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-[#f97316] transition group-hover:bg-[#f97316] group-hover:text-white">
-                  <Phone className="h-5 w-5" />
-                </div>
-                <div>
-                  <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                    Direct Phone Support
+                <div className="flex items-center gap-3.5">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-[#f97316] transition group-hover:bg-[#f97316] group-hover:text-white">
+                    <Phone className="h-5 w-5" />
                   </div>
-                  <div className="text-sm font-bold text-[#0f172a] group-hover:text-[#f97316]">
-                    +91 98765 43210
+                  <div>
+                    <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                      Direct Phone Support
+                    </div>
+                    <div className="text-sm font-bold text-[#0f172a] group-hover:text-[#f97316]">
+                      +91 98317 18493
+                    </div>
                   </div>
                 </div>
-              </a>
+                <span className="rounded-lg border border-orange-200 bg-orange-50/80 px-2.5 py-1 text-[11px] font-bold text-[#f97316] transition group-hover:bg-orange-500 group-hover:text-white">
+                  Call / Info
+                </span>
+              </button>
 
-              <div className="flex items-center gap-3.5 rounded-2xl border border-slate-200/80 bg-slate-50/60 p-3.5">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+              {/* Office Location (West Bengal) */}
+              <div className="flex items-center gap-3.5 rounded-2xl border border-slate-200/80 bg-slate-50/60 p-3.5 transition hover:border-indigo-200 hover:bg-white">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
                   <MapPin className="h-5 w-5" />
                 </div>
                 <div>
                   <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                    Headquarters
+                    Office Location
                   </div>
                   <div className="text-sm font-bold text-[#0f172a]">
-                    New Delhi, India (Deploying Globally)
+                    West Bengal, India
                   </div>
                 </div>
               </div>
@@ -341,7 +362,7 @@ export default function Contact() {
                     name="name"
                     type="text"
                     required
-                    placeholder="e.g. Nitesh Sharma"
+                    placeholder="e.g. Adisofttech"
                     className="w-full rounded-xl border border-slate-200 bg-slate-50/60 px-4 py-3 text-xs font-semibold text-slate-800 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
                   />
                 </div>
@@ -354,7 +375,7 @@ export default function Contact() {
                     id="email"
                     name="email"
                     type="email"
-                    placeholder="nitesh@company.com"
+                    placeholder="adisofttech22@gmail.com"
                     className="w-full rounded-xl border border-slate-200 bg-slate-50/60 px-4 py-3 text-xs font-semibold text-slate-800 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
                   />
                 </div>
@@ -368,7 +389,7 @@ export default function Contact() {
                     name="phone"
                     type="tel"
                     required
-                    placeholder="+91 98765 43210"
+                    placeholder="+91 98317 18493"
                     className="w-full rounded-xl border border-slate-200 bg-slate-50/60 px-4 py-3 text-xs font-semibold text-slate-800 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
                   />
                 </div>
@@ -431,19 +452,17 @@ export default function Contact() {
                     type="button"
                     onClick={handleTriggerVerification}
                     disabled={isVerifying}
-                    className={`w-full flex items-center justify-between gap-3.5 rounded-2xl border-2 p-3 px-4.5 shadow-2xs transition-all text-left group cursor-pointer ${
-                      isVerifying
+                    className={`w-full flex items-center justify-between gap-3.5 rounded-2xl border-2 p-3 px-4.5 shadow-2xs transition-all text-left group cursor-pointer ${isVerifying
                         ? "border-blue-300 bg-blue-50/40 cursor-wait"
                         : "border-slate-200 bg-white hover:border-[#0b57d0] hover:bg-blue-50/20 active:scale-[0.99]"
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center gap-3">
                       <div
-                        className={`flex h-6 w-6 items-center justify-center rounded-lg border-2 transition-all shrink-0 ${
-                          isVerifying
+                        className={`flex h-6 w-6 items-center justify-center rounded-lg border-2 transition-all shrink-0 ${isVerifying
                             ? "border-blue-500 bg-white"
                             : "border-slate-400 bg-white group-hover:border-blue-600 group-hover:scale-105"
-                        }`}
+                          }`}
                       >
                         {isVerifying ? (
                           <Loader2 className="h-4 w-4 animate-spin text-[#0b57d0]" />
@@ -554,6 +573,101 @@ export default function Contact() {
           </div>
         </div>
       </div>
+
+      {/* Direct Phone Support Popup Modal */}
+      {isPhoneModalOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm transition-all"
+          onClick={() => setIsPhoneModalOpen(false)}
+        >
+          <div
+            className="relative w-full max-w-md overflow-hidden rounded-3xl border border-slate-100 bg-white p-6 shadow-2xl sm:p-7 animate-in fade-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setIsPhoneModalOpen(false)}
+              aria-label="Close dialog"
+              className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition hover:bg-slate-200 hover:text-slate-800"
+            >
+              <X className="h-4 w-4" />
+            </button>
+
+            {/* Header */}
+            <div className="flex items-center gap-3.5">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-50 text-[#f97316] shadow-xs">
+                <Phone className="h-6 w-6" />
+              </div>
+              <div>
+                <h3 className="text-lg font-black text-[#0f172a]">
+                  Direct Phone Support
+                </h3>
+                <p className="text-xs text-slate-500">
+                  Connect with Adisofttech engineering team
+                </p>
+              </div>
+            </div>
+
+            {/* Phone Display Box */}
+            <div className="mt-6 flex items-center justify-between rounded-2xl border border-slate-200/90 bg-slate-50 p-4">
+              <div>
+                <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  Direct Line
+                </div>
+                <div className="text-lg font-black tracking-tight text-[#0f172a] sm:text-xl">
+                  +91 98317 18493
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={handleCopyPhone}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 shadow-2xs transition hover:border-blue-300 hover:bg-blue-50/50 hover:text-[#0b57d0]"
+              >
+                {copiedPhone ? (
+                  <>
+                    <Check className="h-3.5 w-3.5 text-emerald-600" />
+                    <span className="text-emerald-700 font-bold">Copied!</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="h-3.5 w-3.5 text-slate-500" />
+                    <span>Copy</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="mt-5 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+              <a
+                href="tel:+919831718493"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#0b57d0] px-4 py-3 text-xs font-bold text-white shadow-xs transition hover:bg-blue-700"
+              >
+                <Phone className="h-4 w-4" />
+                <span>Call Directly</span>
+              </a>
+
+              <a
+                href="https://wa.me/919831718493?text=Hello%20Adisofttech,%20I%20would%20like%20to%20inquire%20about%20your%20services."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3 text-xs font-bold text-white shadow-xs transition hover:bg-emerald-700"
+              >
+                <MessageSquare className="h-4 w-4" />
+                <span>WhatsApp Chat</span>
+              </a>
+            </div>
+
+            {/* Availability Footer Note */}
+            <div className="mt-5 flex items-center justify-center gap-1.5 text-center text-[11px] text-slate-500">
+              <Clock className="h-3.5 w-3.5 text-slate-400" />
+              <span>Available Mon – Sat &bull; 9:00 AM – 7:30 PM IST</span>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

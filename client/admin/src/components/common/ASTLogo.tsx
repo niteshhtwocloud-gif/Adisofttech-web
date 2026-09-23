@@ -22,14 +22,21 @@ export default function ASTLogo({
   height = 42,
   width,
 }: ASTLogoProps) {
+  const [imgSrc, setImgSrc] = React.useState("/admin/images/ast-logo.png");
+
   return (
     <div
       className={`inline-flex items-center select-none ${className}`}
       style={{ height: `${height}px` }}
     >
       <img
-        src="/images/ast-logo.png"
+        src={imgSrc}
         alt="AST Logo"
+        onError={() => {
+          if (imgSrc !== "/images/ast-logo.png") {
+            setImgSrc("/images/ast-logo.png");
+          }
+        }}
         style={{
           height: `${height}px`,
           width: width ? `${width}px` : "auto",

@@ -71,9 +71,9 @@ export default function DashboardMockup() {
           </div>
           <div className="flex items-center gap-1.5 border-l border-slate-200 pl-2">
             <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-tr from-[#0b57d0] to-blue-400 text-[10px] font-bold text-white shadow-2xs">
-              N
+              A
             </div>
-            <span className="text-[10px] font-semibold text-slate-700 hidden sm:inline">Nitesh</span>
+            <span className="text-[10px] font-semibold text-slate-700 hidden sm:inline">Adisofttech</span>
           </div>
         </div>
       </div>
@@ -108,7 +108,7 @@ export default function DashboardMockup() {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-xs font-black tracking-tight text-[#0f172a] sm:text-sm">
-                Good Morning, Nitesh 👋
+                Good Morning, Adisofttech 👋
               </h3>
               <p className="text-[9px] text-slate-400">
                 Let&apos;s make today productive!

@@ -28,7 +28,7 @@ export default function AdminProfilePage() {
           </div>
           <div>
             <h2 className="text-lg font-bold text-[#0f172a]">{user?.name || "AST Administrator"}</h2>
-            <p className="text-xs text-slate-500">{user?.email || "nitesh.htwocloud@gmail.com"}</p>
+            <p className="text-xs text-slate-500">{user?.email || "adisofttech22@gmail.com"}</p>
             <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-0.5 text-[10px] font-bold text-[#0b57d0]">
               <Shield className="h-3 w-3" />
               <span>Role: {user?.role || "admin"}</span>

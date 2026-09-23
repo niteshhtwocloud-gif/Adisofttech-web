@@ -6,7 +6,7 @@ import { ArrowRight } from "lucide-react";
 export default function CTA() {
   const handleScrollToContact = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    const el = document.getElementById("contact-form");
+    const el = document.getElementById("contact");
     if (el) {
       el.scrollIntoView({ behavior: "smooth" });
     }
@@ -28,7 +28,7 @@ export default function CTA() {
           </p>
         </div>
         <a
-          href="#contact-form"
+          href="#contact"
           onClick={handleScrollToContact}
           className="group inline-flex shrink-0 items-center gap-2 rounded-full bg-[#0f172a] px-7 py-4 text-sm font-semibold text-white transition-colors hover:bg-slate-800 cursor-pointer"
         >

@@ -15,7 +15,7 @@ import {
   Layers,
   ChevronRight,
 } from "lucide-react";
-import { getProjectByIdOrSlug, getAllProjects, CaseStudy } from "@/lib/portfolioData";
+import { getProjectByIdOrSlug, fetchProjectByIdOrSlug, getAllProjects, CaseStudy } from "@/lib/portfolioData";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -23,7 +23,7 @@ type Props = { params: Promise<{ id: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const project = getProjectByIdOrSlug(id);
+  const project = await fetchProjectByIdOrSlug(id);
 
   if (!project) {
     return { title: "Case Study Not Found | AST" };
@@ -44,7 +44,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function CaseStudyPage({ params }: Props) {
   const { id } = await params;
-  const project = getProjectByIdOrSlug(id);
+  const project = await fetchProjectByIdOrSlug(id);
 
   if (!project) {
     notFound();
@@ -63,7 +63,7 @@ export default async function CaseStudyPage({ params }: Props) {
               Home
             </Link>
             <ChevronRight className="h-3 w-3 text-slate-300" />
-            <Link href="/#portfolio" className="hover:text-[#0b57d0] transition-colors">
+            <Link href="/portfolio" className="hover:text-[#0b57d0] transition-colors">
               Portfolio
             </Link>
             <ChevronRight className="h-3 w-3 text-slate-300" />
@@ -73,7 +73,7 @@ export default async function CaseStudyPage({ params }: Props) {
           </div>
 
           <Link
-            href="/#portfolio"
+            href="/portfolio"
             className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-slate-700 shadow-2xs transition hover:border-blue-300 hover:text-[#0b57d0]"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
@@ -157,17 +157,17 @@ export default async function CaseStudyPage({ params }: Props) {
       </section>
 
       {/* ==================== HERO SHOWCASE IMAGE ==================== */}
-      <section className="mx-auto max-w-5xl px-5 sm:px-8">
-        <div className="group relative aspect-[16/9] w-full overflow-hidden rounded-3xl border border-slate-200/90 bg-slate-950 shadow-2xl shadow-blue-900/10">
+      <section className="mx-auto max-w-3xl px-5 sm:px-8">
+        <div className="group relative aspect-[16/9] w-full overflow-hidden rounded-3xl border border-slate-200/90 bg-slate-950 shadow-xl shadow-blue-900/5">
           <Image
             src={project.image}
             alt={project.title}
             fill
-            sizes="(max-width: 1024px) 100vw, 1024px"
+            sizes="(max-width: 768px) 100vw, 768px"
             className="object-cover object-center"
             priority
           />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/30 via-transparent to-transparent" />
         </div>
       </section>
 

@@ -80,6 +80,8 @@ export default function Navbar() {
     if (!isHomepage) {
       if (pathname.startsWith("/blog")) {
         setActiveSection("blog");
+      } else if (pathname.startsWith("/portfolio") || pathname.startsWith("/projects")) {
+        setActiveSection("portfolio");
       } else {
         setActiveSection("");
       }
@@ -155,7 +157,14 @@ export default function Navbar() {
         } else {
           const element = document.getElementById(link.id);
           if (element) {
-            element.scrollIntoView({ behavior: "smooth" });
+            const navbarOffset = 80;
+            const elementPosition = element.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - navbarOffset;
+
+            window.scrollTo({
+              top: offsetPosition,
+              behavior: "smooth",
+            });
             setActiveSection(link.id);
             window.history.pushState(null, "", `/#${link.id}`);
           }
@@ -164,6 +173,26 @@ export default function Navbar() {
     },
     [isHomepage]
   );
+
+  const scrollToContact = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    setMenuOpen(false);
+    if (isHomepage) {
+      e.preventDefault();
+      const element = document.getElementById("contact");
+      if (element) {
+        const navbarOffset = 80;
+        const elementPosition = element.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - navbarOffset;
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: "smooth",
+        });
+        setActiveSection("contact");
+        window.history.pushState(null, "", "/#contact");
+      }
+    }
+  };
 
   return (
     <>
@@ -175,16 +204,16 @@ export default function Navbar() {
           {/* Left contact info */}
           <div className="flex items-center gap-6">
             <a
-              href="mailto:info@adisofttech.com"
+              href="mailto:adisofttech22@gmail.com"
               className="flex items-center gap-2 transition hover:text-[#0b57d0]"
             >
               <Mail className="h-3.5 w-3.5 text-[#0b57d0]" />
-              <span>info@adisofttech.com</span>
+              <span>adisofttech22@gmail.com</span>
             </a>
             <span className="text-slate-300">|</span>
             <div className="flex items-center gap-2 text-slate-500">
               <MapPin className="h-3.5 w-3.5 text-[#f97316]" />
-              <span>New Delhi, India</span>
+              <span>West Bengal, India</span>
             </div>
           </div>
 
@@ -280,6 +309,7 @@ export default function Navbar() {
             {/* Get a Free Consultation Primary CTA Button */}
             <Link
               href="/#contact"
+              onClick={scrollToContact}
               className="hidden items-center gap-2 rounded-full bg-gradient-to-r from-[#0b57d0] to-[#1e40af] px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-blue-600/25 transition hover:from-blue-700 hover:to-blue-900 active:scale-[0.98] sm:inline-flex"
             >
               <span>Get a Free Consultation</span>
@@ -325,7 +355,7 @@ export default function Navbar() {
             <div className="mt-5 flex flex-col gap-2.5">
               <Link
                 href="/#contact"
-                onClick={() => setMenuOpen(false)}
+                onClick={scrollToContact}
                 className="flex items-center justify-center gap-2 rounded-full bg-[#0b57d0] px-5 py-3 text-xs font-bold text-white shadow-md shadow-blue-600/20"
               >
                 <span>Get a Free Consultation</span>

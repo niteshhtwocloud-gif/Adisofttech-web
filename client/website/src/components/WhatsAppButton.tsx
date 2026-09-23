@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 
 export default function WhatsAppButton() {
 
-  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "919876543210";
+  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "919831718493";
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=Hello%20ADISOFTTECH%2C%20I%20would%20like%20to%20inquire%20about%20your%20services.`;
 
   return (

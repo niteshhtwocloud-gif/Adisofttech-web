@@ -11,5 +11,5 @@
     "build": "npm --prefix website run build && npm --prefix admin run build",
     "build:website": "npm --prefix website run build",
     "build:admin": "npm --prefix admin run build"
-  }
+  }   
 }

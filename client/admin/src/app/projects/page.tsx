@@ -19,6 +19,7 @@ import {
 import adminApi from "@/services/api";
 import ConfirmModal from "@/components/common/ConfirmModal";
 import ImageUpload from "@/components/common/ImageUpload";
+import { getAdminImageUrl } from "@/utils/image";
 
 interface ProjectItem {
   _id: string;
@@ -303,11 +304,11 @@ export default function ProjectsManagementPage() {
             <div className="relative h-48 w-full bg-slate-900 overflow-hidden">
               {proj.image ? (
                 <img
-                  src={proj.image}
+                  src={getAdminImageUrl(proj.image)}
                   alt={proj.title}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   onError={(e: any) => {
-                    e.currentTarget.src = "/portfolio/business-management.png";
+                    e.currentTarget.src = getAdminImageUrl("/portfolio/business-management.png");
                   }}
                 />
               ) : (

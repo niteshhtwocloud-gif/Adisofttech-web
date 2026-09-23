@@ -49,9 +49,9 @@ export default function AdminSettingsPage() {
   const [companyName, setCompanyName] = useState("AdiSofTech");
   const [tagline, setTagline] = useState("Empowering Enterprises with Scalable Software & Cloud Solutions");
   const [logo, setLogo] = useState("/images/ast-logo.png");
-  const [supportEmail, setSupportEmail] = useState("contact@adisofttech.com");
-  const [phone, setPhone] = useState("+91 98765 43210");
-  const [address, setAddress] = useState("Plot No. 42, Cyber City, Gurugram, Haryana, India");
+  const [supportEmail, setSupportEmail] = useState("adisofttech22@gmail.com");
+  const [phone, setPhone] = useState("+91 98317 18493");
+  const [address, setAddress] = useState("West Bengal, India");
   const [brandLoading, setBrandLoading] = useState(false);
   const [brandSuccess, setBrandSuccess] = useState("");
   const [brandError, setBrandError] = useState("");
@@ -547,7 +547,7 @@ export default function AdminSettingsPage() {
                     type="email"
                     value={supportEmail}
                     onChange={(e) => setSupportEmail(e.target.value)}
-                    placeholder="contact@adisofttech.com"
+                    placeholder="adisofttech22@gmail.com"
                     className="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 py-2.5 pl-9 text-xs text-slate-900 outline-none transition-colors focus:border-[#0b57d0] focus:bg-white"
                   />
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
@@ -574,7 +574,7 @@ export default function AdminSettingsPage() {
                     type="text"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    placeholder="+91 98765 43210"
+                    placeholder="+91 98317 18493"
                     className="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 py-2.5 pl-9 text-xs text-slate-900 outline-none transition-colors focus:border-[#0b57d0] focus:bg-white"
                   />
                   <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
@@ -589,7 +589,7 @@ export default function AdminSettingsPage() {
                     type="text"
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
-                    placeholder="Cyber City, Gurugram, India"
+                    placeholder="West Bengal, India"
                     className="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 py-2.5 pl-9 text-xs text-slate-900 outline-none transition-colors focus:border-[#0b57d0] focus:bg-white"
                   />
                   <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />

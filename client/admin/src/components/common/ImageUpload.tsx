@@ -3,6 +3,7 @@
 import React, { useState, useRef } from "react";
 import { UploadCloud, Image as ImageIcon, X, Loader2, CheckCircle2, Link as LinkIcon } from "lucide-react";
 import adminApi from "@/services/api";
+import { getAdminImageUrl } from "@/utils/image";
 
 interface ImageUploadProps {
   value: string;
@@ -116,7 +117,7 @@ export default function ImageUpload({
             <div className="relative group overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 p-2">
               <div className="relative h-44 w-full overflow-hidden rounded-xl bg-slate-900">
                 <img
-                  src={value}
+                  src={getAdminImageUrl(value)}
                   alt="Uploaded Preview"
                   className="h-full w-full object-cover object-center"
                 />

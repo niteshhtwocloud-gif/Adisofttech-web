@@ -32,36 +32,83 @@ export const sendContactNotification = async ({
   const subject = `🚀 New AST Consultation Request: ${company || name}`;
 
   const html = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background-color: #0d1117; color: #f0f6fc; border-radius: 12px; border: 1px solid #30363d;">
-      <h2 style="color: #58a6ff; margin-bottom: 20px; font-size: 20px;">⚡ New Technical Consultation Lead</h2>
-      <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px;">
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 28px 12px; color: #0f172a;">
+      <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.06); border: 1px solid #e2e8f0;">
+        <!-- Header Banner -->
         <tr>
-          <td style="padding: 10px; border-bottom: 1px solid #21262d; color: #8b949e; width: 140px;">Name</td>
-          <td style="padding: 10px; border-bottom: 1px solid #21262d; color: #f0f6fc; font-weight: bold;">${name}</td>
+          <td style="background: linear-gradient(135deg, #0b57d0 0%, #155eef 50%, #ea580c 100%); padding: 28px 24px; text-align: left;">
+            <div style="display: inline-block; background-color: rgba(255, 255, 255, 0.2); border-radius: 20px; padding: 4px 12px; margin-bottom: 10px;">
+              <span style="color: #ffffff; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">⚡ New Website Inquiry</span>
+            </div>
+            <h1 style="color: #ffffff; margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.3px;">Technical Consultation Lead</h1>
+            <p style="color: rgba(255, 255, 255, 0.9); margin: 6px 0 0 0; font-size: 13px;">Received from AdiSofTech Public Web Portal</p>
+          </td>
         </tr>
+
+        <!-- Body Details -->
         <tr>
-          <td style="padding: 10px; border-bottom: 1px solid #21262d; color: #8b949e;">Company</td>
-          <td style="padding: 10px; border-bottom: 1px solid #21262d; color: #f0f6fc;">${company}</td>
-        </tr>
-        <tr>
-          <td style="padding: 10px; border-bottom: 1px solid #21262d; color: #8b949e;">Phone</td>
-          <td style="padding: 10px; border-bottom: 1px solid #21262d; color: #58a6ff;">${phone}</td>
-        </tr>
-        <tr>
-          <td style="padding: 10px; border-bottom: 1px solid #21262d; color: #8b949e;">Email</td>
-          <td style="padding: 10px; border-bottom: 1px solid #21262d; color: #f0f6fc;">${email || "Not provided"}</td>
-        </tr>
-        <tr>
-          <td style="padding: 10px; border-bottom: 1px solid #21262d; color: #8b949e;">Requested Service</td>
-          <td style="padding: 10px; border-bottom: 1px solid #21262d; color: #f0f6fc;">${service || "Technical Consultation"}</td>
+          <td style="padding: 28px 24px;">
+            <table width="100%" border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse; margin-bottom: 24px;">
+              <tr style="border-bottom: 1px solid #f1f5f9;">
+                <td style="padding: 12px 6px; width: 140px; font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Client Name</td>
+                <td style="padding: 12px 6px; font-size: 14px; font-weight: 700; color: #0f172a;">${name}</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #f1f5f9;">
+                <td style="padding: 12px 6px; font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Company</td>
+                <td style="padding: 12px 6px; font-size: 14px; color: #1e293b; font-weight: 600;">${company}</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #f1f5f9;">
+                <td style="padding: 12px 6px; font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Phone Number</td>
+                <td style="padding: 12px 6px; font-size: 14px; color: #0b57d0; font-weight: 700;">
+                  <a href="tel:${phone}" style="color: #0b57d0; text-decoration: none;">${phone}</a>
+                </td>
+              </tr>
+              <tr style="border-bottom: 1px solid #f1f5f9;">
+                <td style="padding: 12px 6px; font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Email Address</td>
+                <td style="padding: 12px 6px; font-size: 14px; color: #1e293b;">
+                  ${email ? `<a href="mailto:${email}" style="color: #0b57d0; text-decoration: none; font-weight: 600;">${email}</a>` : `<span style="color: #94a3b8; font-style: italic;">Not provided</span>`}
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 12px 6px; font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Required Service</td>
+                <td style="padding: 12px 6px;">
+                  <span style="display: inline-block; background-color: #eff6ff; color: #0b57d0; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 8px; border: 1px solid #bfdbfe;">
+                    ${service || "Technical Consultation"}
+                  </span>
+                </td>
+              </tr>
+            </table>
+
+            <!-- Message Block -->
+            <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #0b57d0; border-radius: 10px; padding: 16px 18px; margin-bottom: 24px;">
+              <h4 style="margin: 0 0 8px 0; color: #0b57d0; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">Project Scope & Deliverables</h4>
+              <p style="margin: 0; color: #334155; font-size: 13px; line-height: 1.65; white-space: pre-wrap;">${message}</p>
+            </div>
+
+            <hr style="border: none; border-top: 1px solid #f1f5f9; margin: 20px 0;">
+
+            <!-- Footer -->
+            <table width="100%" border="0" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="font-size: 11px; color: #94a3b8; text-align: left;">
+                  Sent via AdiSofTech Lead Notification System
+                </td>
+                <td style="font-size: 11px; color: #94a3b8; text-align: right;">
+                  ${new Date().toLocaleString()}
+                </td>
+              </tr>
+            </table>
+          </td>
         </tr>
       </table>
-      <div style="background-color: #161b22; padding: 16px; border-radius: 8px; border: 1px solid #30363d; margin-bottom: 20px;">
-        <h4 style="margin: 0 0 8px 0; color: #8b949e; font-size: 12px; text-transform: uppercase;">Message</h4>
-        <p style="margin: 0; color: #e6edf3; line-height: 1.6; white-space: pre-wrap;">${message}</p>
-      </div>
-      <p style="font-size: 12px; color: #6e7681; margin: 0;">Sent via AdiSofTech Full-Stack Ingestion Engine • ${new Date().toLocaleString()}</p>
-    </div>
+    </body>
+    </html>
   `;
 
   try {

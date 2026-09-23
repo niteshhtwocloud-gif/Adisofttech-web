@@ -39,7 +39,7 @@ export default function PhoneMockup() {
       {/* Greeting */}
       <div className="px-3 pt-3">
         <h4 className="text-[11px] font-black text-[#0f172a]">
-          Hi, Nitesh 👋
+          Hi, Adisofttech 👋
         </h4>
         <p className="text-[8px] text-slate-500">
           Manage your business anywhere

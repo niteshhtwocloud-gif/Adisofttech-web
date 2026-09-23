@@ -16,6 +16,8 @@ import {
   RefreshCw,
   ExternalLink,
   X,
+  Copy,
+  Check,
 } from "lucide-react";
 import adminApi from "@/services/api";
 import ConfirmModal from "@/components/common/ConfirmModal";
@@ -32,6 +34,23 @@ export default function ContactsLeadsPage() {
   // Delete modal state
   const [contactToDelete, setContactToDelete] = useState<{ id: string; name: string } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Quick Call & Contact Modal state
+  const [activeCallModal, setActiveCallModal] = useState<{
+    name: string;
+    phone: string;
+    company?: string;
+    service?: string;
+  } | null>(null);
+  const [copiedPhone, setCopiedPhone] = useState(false);
+
+  const handleCopyPhone = (phone: string) => {
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(phone);
+      setCopiedPhone(true);
+      setTimeout(() => setCopiedPhone(false), 2500);
+    }
+  };
 
   const showToast = (text: string, type: "success" | "error" = "success") => {
     setToast({ text, type });
@@ -247,14 +266,23 @@ export default function ContactsLeadsPage() {
 
               <div className="mt-4 flex flex-wrap items-center gap-3 text-xs">
                 <div>
-                  <a
-                    href={`tel:${(lead.phone || "").replace(/[^\d+]/g, "")}`}
-                    className="inline-flex items-center gap-2 rounded-xl border border-blue-100 bg-blue-50/60 px-3 py-1.5 font-semibold text-[#0b57d0] no-underline hover:no-underline hover:bg-blue-100/80 hover:border-blue-200 transition-all cursor-pointer group shadow-2xs"
-                    title={`Click to call ${lead.phone}`}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCopiedPhone(false);
+                      setActiveCallModal({
+                        name: lead.name,
+                        phone: lead.phone,
+                        company: lead.company,
+                        service: lead.service,
+                      });
+                    }}
+                    className="inline-flex items-center gap-2 rounded-xl border border-blue-100 bg-blue-50/60 px-3 py-1.5 font-semibold text-[#0b57d0] hover:bg-blue-100/80 hover:border-blue-200 transition-all cursor-pointer group shadow-2xs"
+                    title={`Contact options for ${lead.phone}`}
                   >
                     <Phone className="h-3.5 w-3.5 text-[#0b57d0] group-hover:scale-110 transition-transform shrink-0" />
-                    <span className="no-underline">{lead.phone}</span>
-                  </a>
+                    <span>{lead.phone}</span>
+                  </button>
                 </div>
 
                 <div>
@@ -295,6 +323,107 @@ export default function ContactsLeadsPage() {
         variant="danger"
         isLoading={isDeleting}
       />
+
+      {/* Quick Contact & Call Action Modal */}
+      {activeCallModal && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm transition-all"
+          onClick={() => setActiveCallModal(null)}
+        >
+          <div
+            className="relative w-full max-w-md overflow-hidden rounded-3xl border border-slate-100 bg-white p-6 shadow-2xl sm:p-7 animate-in fade-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setActiveCallModal(null)}
+              aria-label="Close dialog"
+              className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition hover:bg-slate-200 hover:text-slate-800"
+            >
+              <X className="h-4 w-4" />
+            </button>
+
+            {/* Header */}
+            <div className="flex items-center gap-3.5">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-[#0b57d0] shadow-xs">
+                <Phone className="h-6 w-6" />
+              </div>
+              <div>
+                <h3 className="text-lg font-black text-[#0f172a]">
+                  Contact Inquiry Lead
+                </h3>
+                <p className="text-xs text-slate-500">
+                  {activeCallModal.name} {activeCallModal.company ? `• ${activeCallModal.company}` : ""}
+                </p>
+              </div>
+            </div>
+
+            {/* Phone Display Box */}
+            <div className="mt-6 flex items-center justify-between rounded-2xl border border-slate-200/90 bg-slate-50 p-4">
+              <div>
+                <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  Client Contact Number
+                </div>
+                <div className="text-lg font-black tracking-tight text-[#0f172a] sm:text-xl">
+                  {activeCallModal.phone}
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleCopyPhone(activeCallModal.phone)}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 shadow-2xs transition hover:border-blue-300 hover:bg-blue-50/50 hover:text-[#0b57d0]"
+              >
+                {copiedPhone ? (
+                  <>
+                    <Check className="h-3.5 w-3.5 text-emerald-600" />
+                    <span className="text-emerald-700 font-bold">Copied!</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="h-3.5 w-3.5 text-slate-500" />
+                    <span>Copy</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="mt-5 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+              <a
+                href={`https://wa.me/${(() => {
+                  const c = activeCallModal.phone.replace(/[^\d]/g, "");
+                  return c.length === 10 ? `91${c}` : c;
+                })()}?text=${encodeURIComponent(
+                  `Hello ${activeCallModal.name}, this is from Adisofttech regarding your inquiry for ${activeCallModal.service || "our technology services"}.`
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3 text-xs font-bold text-white shadow-xs transition hover:bg-emerald-700"
+              >
+                <MessageSquare className="h-4 w-4" />
+                <span>Chat on WhatsApp</span>
+              </a>
+
+              <a
+                href={`tel:${activeCallModal.phone.replace(/[^\d+]/g, "")}`}
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#0b57d0] px-4 py-3 text-xs font-bold text-white shadow-xs transition hover:bg-blue-700"
+              >
+                <Phone className="h-4 w-4" />
+                <span>Call via Dialer</span>
+              </a>
+            </div>
+
+            {/* Service & Inquiry Note */}
+            {activeCallModal.service && (
+              <div className="mt-4 rounded-xl bg-slate-50 px-3.5 py-2 text-center text-xs text-slate-600 border border-slate-100">
+                Interested in: <strong className="text-slate-800">{activeCallModal.service}</strong>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

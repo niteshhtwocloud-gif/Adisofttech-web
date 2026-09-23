@@ -42,7 +42,7 @@ export default function AdminUsersPage() {
                 </div>
                 <div className="mt-1 flex items-center gap-2 text-xs text-slate-500">
                   <Mail className="h-3.5 w-3.5 text-slate-400" />
-                  <span>{currentUser?.email || "nitesh.htwocloud@gmail.com"}</span>
+                  <span>{currentUser?.email || "adisofttech22@gmail.com"}</span>
                 </div>
               </div>
             </div>

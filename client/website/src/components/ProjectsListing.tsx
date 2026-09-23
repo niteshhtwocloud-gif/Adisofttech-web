@@ -18,6 +18,40 @@ import {
   FolderGit2,
 } from "lucide-react";
 import { PROJECTS as STATIC_PROJECTS, CaseStudy } from "@/lib/portfolioData";
+import { getWebsiteImageUrl } from "@/utils/image";
+
+function ProjectCardImage({
+  src,
+  alt,
+  priority,
+}: {
+  src: string;
+  alt: string;
+  priority?: boolean;
+}) {
+  const [imgSrc, setImgSrc] = useState(src || "/portfolio/business-management.png");
+
+  useEffect(() => {
+    setImgSrc(src || "/portfolio/business-management.png");
+  }, [src]);
+
+  return (
+    <Image
+      src={imgSrc}
+      alt={alt}
+      fill
+      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+      className="object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105"
+      priority={priority}
+      onError={() => {
+        if (imgSrc !== "/portfolio/business-management.png") {
+          setImgSrc("/portfolio/business-management.png");
+        }
+      }}
+    />
+  );
+}
+
 
 const CATEGORIES = [
   "All",
@@ -55,7 +89,7 @@ export default function ProjectsListing() {
               category: p.category || "Custom Software",
               description: p.description,
               tags: p.technologies || [],
-              image: p.image || "/portfolio/business-management.png",
+              image: getWebsiteImageUrl(p.image),
               metrics: p.metrics ? [{ label: "Impact", value: p.metrics, description: "Key Result" }] : [],
               liveUrl: p.liveUrl,
             }));
@@ -184,11 +218,10 @@ export default function ProjectsListing() {
                   <button
                     key={cat}
                     onClick={() => setSelectedCategory(cat)}
-                    className={`rounded-xl px-3.5 py-2 text-xs font-bold transition-all cursor-pointer ${
-                      isSelected
+                    className={`rounded-xl px-3.5 py-2 text-xs font-bold transition-all cursor-pointer ${isSelected
                         ? "bg-[#0b57d0] text-white shadow-sm shadow-blue-600/25 scale-[1.02]"
                         : "bg-white text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-slate-200/80"
-                    }`}
+                      }`}
                   >
                     {cat}
                   </button>
@@ -239,12 +272,9 @@ export default function ProjectsListing() {
                 >
                   {/* Thumbnail / Image Container */}
                   <Link href={detailHref} className="relative aspect-[16/10] w-full overflow-hidden bg-slate-950 block">
-                    <Image
-                      src={project.image || "/portfolio/business-management.png"}
+                    <ProjectCardImage
+                      src={project.image}
                       alt={project.title}
-                      fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      className="object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105"
                       priority={idx < 3}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent opacity-85 transition-opacity group-hover:opacity-95" />

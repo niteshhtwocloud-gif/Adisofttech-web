@@ -1,3 +1,5 @@
+import { getWebsiteImageUrl } from "@/utils/image";
+
 // Portfolio case studies, client success metrics, and technology stack definitions.
 export interface CaseStudy {
   id: number;
@@ -266,6 +268,56 @@ export function getProjectByIdOrSlug(idOrSlug: string | number): CaseStudy | und
   );
 }
 
+export async function fetchProjectByIdOrSlug(idOrSlug: string | number): Promise<CaseStudy | undefined> {
+  const local = getProjectByIdOrSlug(idOrSlug);
+  if (local) return local;
+
+  try {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
+    const res = await fetch(`${apiUrl}/projects/${idOrSlug}`, { next: { revalidate: 60 } });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.project) {
+        const p = data.project;
+        return {
+          id: p.order || 999,
+          slug: p.slug,
+          title: p.title,
+          category: p.category || "Custom Software",
+          filterKey: "business",
+          tagline: p.description,
+          description: p.description,
+          fullOverview: p.description,
+          clientIndustry: p.client || "Enterprise Client",
+          timeline: "Production Deployed",
+          tags: p.technologies || [],
+          image: getWebsiteImageUrl(p.image),
+          features: [
+            "Bespoke modular architecture configured for high reliability",
+            "Role-based access privileges and automated security checks",
+            "API-first engineering built for real-time telemetry and sync",
+          ],
+          challenge:
+            "Modernizing operational workflows and standardizing high-throughput system performance.",
+          solution:
+            "AST engineered a bespoke architecture tailored to client infrastructure and scale requirements.",
+          metrics: p.metrics
+            ? [{ label: "Impact", value: p.metrics, description: "Key Result" }]
+            : [{ label: "Production Status", value: "Active", description: "System operational" }],
+          techStack: (p.technologies || []).map((t: string) => ({
+            name: t,
+            role: "Core Technology",
+          })),
+        };
+      }
+    }
+  } catch (err) {
+    console.warn("Could not fetch remote project:", err);
+  }
+  return undefined;
+}
+
 export function getAllProjects(): CaseStudy[] {
   return PROJECTS;
 }
+

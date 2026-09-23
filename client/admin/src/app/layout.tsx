@@ -36,6 +36,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <html lang="en">
         <head>
           <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="icon" href="/admin/favicon.ico" sizes="any" />
+          <link rel="icon" type="image/png" sizes="32x32" href="/admin/favicon.png" />
+          <link rel="icon" type="image/png" href="/admin/icon.png" />
+          <link rel="apple-touch-icon" href="/admin/apple-icon.png" />
+          <title>Admin Portal | AST Enterprise CMS</title>
         </head>
         <body className="min-h-screen bg-slate-50 font-sans antialiased">{children}</body>
       </html>
@@ -47,6 +52,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <html lang="en">
         <head>
           <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="icon" href="/admin/favicon.ico" sizes="any" />
+          <link rel="icon" type="image/png" sizes="32x32" href="/admin/favicon.png" />
+          <link rel="icon" type="image/png" href="/admin/icon.png" />
+          <link rel="apple-touch-icon" href="/admin/apple-icon.png" />
+          <title>Admin Portal | AST Enterprise CMS</title>
         </head>
         <body className="flex min-h-screen items-center justify-center bg-slate-50">
           <div className="flex flex-col items-center gap-3">
@@ -62,6 +72,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/admin/favicon.ico" sizes="any" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/admin/favicon.png" />
+        <link rel="icon" type="image/png" href="/admin/icon.png" />
+        <link rel="apple-touch-icon" href="/admin/apple-icon.png" />
+        <title>Admin Dashboard | AST Enterprise CMS</title>
       </head>
       <body className="min-h-screen bg-[#f8fafc] font-sans antialiased text-slate-900 flex">
         {/* Responsive Sticky/Drawer Sidebar */}

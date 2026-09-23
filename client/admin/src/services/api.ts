@@ -58,13 +58,15 @@ class AdminApiClient {
       headers,
     });
 
-    if (res.status === 401) {
-      // Auto-logout on unauthorized token
-      this.logout();
-      throw new Error("Session expired. Please log in again.");
-    }
-
     const data = await res.json().catch(() => ({}));
+
+    if (res.status === 401) {
+      // Auto-logout ONLY for authenticated API calls, NOT during login itself
+      if (endpoint !== "/auth/login") {
+        this.logout();
+        throw new Error(data.message || "Session expired. Please log in again.");
+      }
+    }
 
     if (!res.ok) {
       throw new Error(data.message || `Request failed with status ${res.status}`);

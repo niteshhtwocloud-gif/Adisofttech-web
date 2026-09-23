@@ -84,15 +84,19 @@ export const createContact = async (data, remoteIp = "") => {
     message: message.trim(),
   });
 
-  // Asynchronously dispatch email notification (non-blocking)
-  sendContactNotification({
-    name: contact.name,
-    email: contact.email,
-    phone: contact.phone,
-    company: contact.company,
-    service: contact.service,
-    message: contact.message,
-  }).catch((err) => console.error("Email notification background error:", err));
+  // Dispatch email notification to recipient
+  try {
+    await sendContactNotification({
+      name: contact.name,
+      email: contact.email,
+      phone: contact.phone,
+      company: contact.company,
+      service: contact.service,
+      message: contact.message,
+    });
+  } catch (err) {
+    console.error("Email notification error in createContact:", err);
+  }
 
   return contact;
 };

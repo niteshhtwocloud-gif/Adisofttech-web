@@ -122,7 +122,9 @@ export default function AdminSidebar({ isOpen = false, onClose }: AdminSidebarPr
       {/* Bottom Footer Area */}
       <div className="border-t border-slate-200/80 p-3 space-y-1 bg-slate-50/50">
         <a
-          href="/"
+          href={process.env.NEXT_PUBLIC_WEBSITE_URL || "http://localhost:3000"}
+          target="_blank"
+          rel="noreferrer"
           className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-medium text-slate-600 transition-colors hover:bg-white hover:text-slate-900 border border-transparent hover:border-slate-200/80"
         >
           <span className="flex items-center gap-2">

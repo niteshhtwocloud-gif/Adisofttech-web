@@ -13,6 +13,7 @@ import {
   CheckCircle2,
   KeyRound,
   RefreshCw,
+  X,
 } from "lucide-react";
 import ASTLogo from "../common/ASTLogo";
 import adminApi from "@/services/api";
@@ -315,9 +316,19 @@ export default function AdminLoginPortal() {
           {mode === "login" && (
             <div className="mt-6">
               {loginError && (
-                <div className="mb-4 flex items-start gap-2.5 rounded-xl border border-rose-200 bg-rose-50/90 p-3 text-xs font-semibold text-rose-700 animate-in fade-in duration-200">
-                  <AlertCircle className="h-4 w-4 shrink-0 text-rose-600 mt-0.5" />
-                  <span>{loginError}</span>
+                <div className="mb-4 flex items-center justify-between gap-2.5 rounded-xl border border-rose-200 bg-rose-50/95 p-3 text-xs font-semibold text-rose-700 animate-in fade-in duration-200">
+                  <div className="flex items-center gap-2">
+                    <AlertCircle className="h-4 w-4 shrink-0 text-rose-600" />
+                    <span>{loginError}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setLoginError("")}
+                    className="p-1 text-rose-500 hover:text-rose-800 rounded-md transition-colors"
+                    title="Dismiss"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
                 </div>
               )}
 
@@ -330,10 +341,7 @@ export default function AdminLoginPortal() {
                   <input
                     type="email"
                     value={email}
-                    onChange={(e) => {
-                      setEmail(e.target.value);
-                      if (loginError) setLoginError("");
-                    }}
+                    onChange={(e) => setEmail(e.target.value)}
                     placeholder="Email address"
                     autoComplete="email"
                     required
@@ -349,10 +357,7 @@ export default function AdminLoginPortal() {
                   <input
                     type={showPassword ? "text" : "password"}
                     value={password}
-                    onChange={(e) => {
-                      setPassword(e.target.value);
-                      if (loginError) setLoginError("");
-                    }}
+                    onChange={(e) => setPassword(e.target.value)}
                     placeholder="Password"
                     autoComplete="current-password"
                     required
@@ -382,7 +387,7 @@ export default function AdminLoginPortal() {
                   <button
                     type="button"
                     onClick={() => {
-                      setResetEmail(email || "nitesh.htwocloud@gmail.com");
+                      setResetEmail(email || "adisofttech22@gmail.com");
                       setResetError("");
                       setResetSuccessMsg("");
                       setMode("forgot-request");
@@ -427,7 +432,7 @@ export default function AdminLoginPortal() {
               <p className="text-center text-xs text-slate-500">
                 Not an admin?{" "}
                 <a
-                  href="mailto:contact@adisofttech.com"
+                  href="mailto:adisofttech22@gmail.com"
                   className="text-slate-600 hover:text-slate-900 transition-colors font-medium"
                 >
                   Contact your system administrator.
