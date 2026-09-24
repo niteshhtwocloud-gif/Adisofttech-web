@@ -77,7 +77,18 @@ export default function Footer() {
             <p className="mt-4 text-sm leading-relaxed text-slate-600 max-w-xs">
               We build modern web, mobile and business software solutions for growing businesses.
             </p>
-            <div className="mt-6 flex items-center gap-2.5">
+
+            {/* GSTIN Number */}
+            <div className="mt-4.5 flex items-center gap-2.5">
+              <span className="inline-flex items-center rounded-md bg-blue-50 border border-blue-200 px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-[#0b57d0]">
+                GSTIN
+              </span>
+              <span className="font-mono text-sm sm:text-[15px] font-bold tracking-wider text-slate-900 select-all">
+                19ATJPR3086M1ZU
+              </span>
+            </div>
+
+            <div className="mt-5 flex items-center gap-2.5">
               {SOCIAL_LINKS.map((item) => (
                 <a
                   key={item.label}

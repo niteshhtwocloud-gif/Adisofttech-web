@@ -9,7 +9,7 @@ import Contact from "@/components/Contact";
 // Primary landing page assembling hero, trust markers, services, portfolio, and contact section.
 export default function Home() {
   return (
-    <main className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white w-full max-w-full overflow-x-hidden">
       <Hero />
       <TrustSection />
       <About />
@@ -17,6 +17,6 @@ export default function Home() {
       <BusinessOS />
       <Portfolio />
       <Contact />
-    </main>
+    </div>
   );
 }

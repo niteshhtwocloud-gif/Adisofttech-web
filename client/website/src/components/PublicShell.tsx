@@ -31,7 +31,7 @@ export default function PublicShell({ children }: { children: React.ReactNode })
   return (
     <>
       <Navbar />
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 w-full min-w-0 overflow-x-hidden">{children}</main>
       <Footer />
       <WhatsAppButton />
     </>

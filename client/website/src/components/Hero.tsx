@@ -161,7 +161,7 @@ export default function Hero() {
 
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 5000);
+    }, 3000);
 
     return () => clearInterval(interval);
   }, [slides.length]);
@@ -181,7 +181,7 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className="relative overflow-hidden bg-gradient-to-b from-white via-[#f8fafc] to-[#f0f7ff] pt-0 pb-14 sm:pb-20"
+      className="relative w-full max-w-full overflow-hidden bg-gradient-to-b from-white via-[#f8fafc] to-[#f0f7ff] pt-0 pb-14 sm:pb-20"
     >
       {/* ------------------------------------------------------------- */}
       {/* Ambient Glows                                                 */}
@@ -192,7 +192,7 @@ export default function Hero() {
       {/* ========================================================= */}
       {/* Full-Width Hero Carousel Slider (Flush with Navbar)       */}
       {/* ========================================================= */}
-      <div className="group relative w-full overflow-hidden bg-white border-b border-slate-100 shadow-xs">
+      <div className="group relative w-full max-w-full overflow-hidden bg-white border-b border-slate-100 shadow-xs">
         {/* Slider Slides Track */}
         <div
           className="flex w-full transition-transform duration-700 ease-in-out"
@@ -203,15 +203,15 @@ export default function Hero() {
             const targetLink = slide.link || "/#contact";
 
             return (
-              <div key={slide._id || idx} className="min-w-full shrink-0">
+              <div key={slide._id || idx} className="w-full min-w-full max-w-full shrink-0 basis-full">
                 <Link
                   href={targetLink}
-                  className="block relative aspect-[2.4/1] w-full select-none cursor-pointer"
+                  className="block relative w-full max-w-full select-none cursor-pointer"
                 >
                   <img
                     src={imgSrc}
                     alt={slide.title || `Hero banner ${idx + 1}`}
-                    className="h-full w-full object-cover object-center"
+                    className="w-full h-auto max-w-full block"
                     loading={idx === 0 ? "eager" : "lazy"}
                   />
                 </Link>
@@ -224,30 +224,30 @@ export default function Hero() {
         <button
           onClick={prevSlide}
           aria-label="Previous Banner"
-          className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 flex h-9 w-9 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-white/85 hover:bg-white text-slate-800 backdrop-blur-md shadow-lg hover:shadow-xl transition-all opacity-0 group-hover:opacity-100 z-20 cursor-pointer hover:scale-105"
+          className="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 flex h-8 w-8 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-white/85 hover:bg-white text-slate-800 backdrop-blur-md shadow-md sm:shadow-lg hover:shadow-xl transition-all opacity-0 group-hover:opacity-100 z-20 cursor-pointer hover:scale-105"
         >
-          <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6 text-slate-700" />
+          <ChevronLeft className="h-4 w-4 sm:h-6 sm:w-6 text-slate-700" />
         </button>
 
         {/* Right Arrow Navigation Button */}
         <button
           onClick={nextSlide}
           aria-label="Next Banner"
-          className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 flex h-9 w-9 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-white/85 hover:bg-white text-slate-800 backdrop-blur-md shadow-lg hover:shadow-xl transition-all opacity-0 group-hover:opacity-100 z-20 cursor-pointer hover:scale-105"
+          className="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 flex h-8 w-8 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-white/85 hover:bg-white text-slate-800 backdrop-blur-md shadow-md sm:shadow-lg hover:shadow-xl transition-all opacity-0 group-hover:opacity-100 z-20 cursor-pointer hover:scale-105"
         >
-          <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-slate-700" />
+          <ChevronRight className="h-4 w-4 sm:h-6 sm:w-6 text-slate-700" />
         </button>
 
         {/* Bottom Pagination Dots & Live Pill */}
-        <div className="absolute bottom-3 sm:bottom-5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 sm:gap-2 rounded-full bg-black/40 backdrop-blur-md px-3.5 py-1.5 shadow-md">
+        <div className="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 sm:gap-2 rounded-full bg-black/40 backdrop-blur-md px-2.5 py-1 sm:px-3.5 sm:py-1.5 shadow-md">
           {slides.map((_, idx) => (
             <button
               key={idx}
               onClick={() => setCurrentSlide(idx)}
               aria-label={`Go to slide ${idx + 1}`}
               className={`rounded-full transition-all duration-300 cursor-pointer ${safeIndex === idx
-                ? "h-2 w-6 sm:w-8 bg-[#0b57d0] shadow-sm"
-                : "h-2 w-2 bg-white/60 hover:bg-white"
+                ? "h-1.5 sm:h-2 w-4 sm:w-8 bg-[#0b57d0] shadow-sm"
+                : "h-1.5 sm:h-2 w-1.5 sm:w-2 bg-white/60 hover:bg-white"
                 }`}
             />
           ))}
