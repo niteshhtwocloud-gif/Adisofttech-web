@@ -87,7 +87,6 @@ export default function DashboardMockup() {
             </div>
             <span className="text-[10px] font-semibold text-slate-700 hidden sm:inline">Adisofttech</span>
           </div>
-          </div>
         </div>
       </div>
 
