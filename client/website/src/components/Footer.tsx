@@ -7,7 +7,7 @@ import {
   LinkedinIcon,
   FacebookIcon,
   YoutubeIcon,
-  InstagramIcon,
+  TwitterXIcon,
 } from "./icons/SocialIcons";
 import ASTLogo from "./ASTLogo";
 
@@ -40,10 +40,10 @@ const SUPPORT_LINKS = [
 ];
 
 const SOCIAL_LINKS = [
-  { icon: LinkedinIcon, label: "LinkedIn", href: "https://linkedin.com" },
-  { icon: FacebookIcon, label: "Facebook", href: "https://facebook.com" },
-  { icon: YoutubeIcon, label: "YouTube", href: "https://youtube.com" },
-  { icon: InstagramIcon, label: "Instagram", href: "https://instagram.com" },
+  { icon: LinkedinIcon, label: "LinkedIn", href: "https://www.linkedin.com/company/adisofttech" },
+  { icon: FacebookIcon, label: "Facebook", href: "https://www.facebook.com/Adisofttech/" },
+  { icon: YoutubeIcon, label: "YouTube", href: "https://youtube.com/@future_tech_ai_idea?si=1WHMyJBHfVDJG0ixe" },
+  { icon: TwitterXIcon, label: "X (Twitter)", href: "https://x.com/pradeep_maniray" },
 ];
 
 // ==================== FOOTER COMPONENT ====================

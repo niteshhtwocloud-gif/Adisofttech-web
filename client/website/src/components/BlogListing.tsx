@@ -39,6 +39,13 @@ export default function BlogListing({ initialPosts }: BlogListingProps) {
             (post.category || "").includes("Automation")
           );
         }
+        if (selectedCategory === "Mobile Development") {
+          return (
+            (post.category || "").toLowerCase() === "mobile development" ||
+            (post.category || "").toLowerCase() === "mobile apps" ||
+            (post.category || "").toLowerCase().includes("mobile")
+          );
+        }
         return (post.category || "").toLowerCase() === selectedCategory.toLowerCase();
       });
     }

@@ -10,6 +10,7 @@ interface ImageUploadProps {
   onChange: (url: string) => void;
   label?: string;
   placeholder?: string;
+  folder?: string;
 }
 
 export default function ImageUpload({

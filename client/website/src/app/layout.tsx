@@ -14,41 +14,90 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: {
-    default: "AST | Web, Mobile & Business Software for Growing Businesses",
-    template: "%s | AST",
-  },
+  title:
+    "ADISOFTTECH | Tally Expert, TDL Expert, Tally Integration & Custom Software",
+
   description:
-    "AST provides modern web applications, mobile apps, custom business software, Tally customization, and Business OS solutions for growing enterprises.",
+    "ADISOFTTECH offers expert TallyPrime customization, TDL development, Tally API integration, custom software, web applications, CRM, ERP and business automation solutions.",
+
   keywords: [
-    "AST",
-    "web development",
-    "mobile app development",
-    "custom business software",
-    "Tally customization",
-    "ERP customization",
-    "cloud solutions",
-    "business automation",
-    "Business OS",
+    // Tally Expert Keywords
+    "Tally Expert",
+    "TallyPrime Expert",
+    "Tally Prime Expert",
+    "Tally Developer",
+    "TallyPrime Developer",
+    "Tally Customization Expert",
+    "Tally Customization Services",
+
+    // TDL Keywords
+    "TDL Expert",
+    "Tally TDL Expert",
+    "TDL Developer",
+    "Tally TDL Developer",
+    "TDL Development Services",
+    "Custom TDL Development",
+    "TallyPrime TDL Development",
+
+    // Tally Integration
+    "Tally Integration Expert",
+    "Tally Integration Services",
+    "Tally API Integration",
+    "TallyPrime API Integration",
+    "Tally Integration with Third Party Software",
+    "Tally CRM Integration",
+    "Tally ERP Integration",
+    "Tally Software Integration",
+    "Tally Web Integration",
+    "Tally Automation",
+
+    // Tally Customization
+    "Tally Prime Customization",
+    "Tally Invoice Customization",
+    "Tally Custom Reports",
+    "Tally Report Customization",
+    "Tally Voucher Customization",
+    "Tally Barcode Integration",
+
+    // Software Development
+    "Custom Software Development",
+    "Custom Software Development Company",
+    "Custom Application Development",
+    "Web Application Development",
+    "CRM Development",
+    "ERP Development",
+    "API Integration Services",
+    "Business Automation Software",
+
+    "ADISOFTTECH",
   ],
-  authors: [{ name: "AST" }],
+
+  authors: [{ name: "ADISOFTTECH" }],
+
   openGraph: {
-    type: "website",
-    url: SITE_URL,
-    siteName: "AST",
-    title: "AST | Web, Mobile & Business Software for Growing Businesses",
+    title:
+      "ADISOFTTECH | Tally Expert, TDL Development & Software Solutions",
+
     description:
-      "AST provides modern web applications, mobile apps, custom business software, Tally customization, and Business OS solutions for growing enterprises.",
+      "Expert TallyPrime customization, TDL development, Tally API integration and custom business software development services.",
+
+    url: SITE_URL,
+    siteName: "ADISOFTTECH",
+    type: "website",
   },
+
   twitter: {
     card: "summary_large_image",
-    title: "AST | Web, Mobile & Business Software for Growing Businesses",
+    title:
+      "ADISOFTTECH | Tally Expert, TDL Development & Software Solutions",
     description:
-      "AST provides modern web applications, mobile apps, custom business software, Tally customization, and Business OS solutions for growing enterprises.",
+      "Expert TallyPrime customization, TDL development, Tally API integration and custom business software development services.",
   },
+
   alternates: {
     canonical: "/",
   },
+
   icons: {
     icon: [
       { url: "/favicon.ico" },

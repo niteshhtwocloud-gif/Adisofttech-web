@@ -18,6 +18,7 @@ import {
   Phone,
   Building2,
   ExternalLink,
+  FolderGit2,
 } from "lucide-react";
 import adminApi from "@/services/api";
 
@@ -25,6 +26,8 @@ import adminApi from "@/services/api";
 export default function AdminDashboardPage() {
   const [blogs, setBlogs] = useState<any[]>([]);
   const [contacts, setContacts] = useState<any[]>([]);
+  const [services, setServices] = useState<any[]>([]);
+  const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -32,12 +35,16 @@ export default function AdminDashboardPage() {
     setLoading(true);
     setError("");
     try {
-      const [blogsRes, contactsRes] = await Promise.all([
+      const [blogsRes, contactsRes, servicesRes, projectsRes] = await Promise.all([
         adminApi.getBlogs({ limit: 10 }),
         adminApi.getContacts({ limit: 10 }),
+        adminApi.getServices(),
+        adminApi.getProjects(),
       ]);
       setBlogs(blogsRes.blogs || []);
       setContacts(contactsRes.contacts || []);
+      setServices(servicesRes.services || []);
+      setProjects(projectsRes.projects || []);
     } catch (err: any) {
       console.error("Dashboard error:", err);
       setError(err.message || "Failed to load dashboard metrics");
@@ -54,6 +61,8 @@ export default function AdminDashboardPage() {
   const publishedBlogs = blogs.filter((b) => b.published !== false).length;
   const draftBlogs = totalBlogs - publishedBlogs;
   const totalContacts = contacts.length;
+  const totalServices = services.length;
+  const totalProjects = projects.length;
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto pb-12">
@@ -92,8 +101,8 @@ export default function AdminDashboardPage() {
         </div>
       )}
 
-      {/* Metrics Row (Entire Cards Are Clickable With Pointer Cursor) */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Metrics Row (Clickable Cards with smooth hover effects) */}
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {/* Total Inquiries Card */}
         <Link
           href="/contacts"
@@ -115,7 +124,49 @@ export default function AdminDashboardPage() {
           </div>
         </Link>
 
-        {/* Total Articles Card */}
+        {/* Services Card */}
+        <Link
+          href="/services"
+          className="group block rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs transition-all duration-200 hover:-translate-y-1 hover:border-indigo-300 hover:shadow-md cursor-pointer"
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Services</span>
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 transition-colors group-hover:bg-indigo-600 group-hover:text-white">
+              <Layers className="h-4 w-4" />
+            </div>
+          </div>
+          <div className="mt-4 flex items-baseline gap-2">
+            <span className="text-3xl font-black text-[#0f172a]">{totalServices}</span>
+            <span className="text-[11px] font-semibold text-indigo-600">Active Offerings</span>
+          </div>
+          <div className="mt-3 flex items-center gap-1.5 text-xs font-semibold text-indigo-600">
+            <span>Manage services</span>
+            <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-1" />
+          </div>
+        </Link>
+
+        {/* Portfolio Projects Card */}
+        <Link
+          href="/projects"
+          className="group block rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs transition-all duration-200 hover:-translate-y-1 hover:border-blue-400 hover:shadow-md cursor-pointer"
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Projects</span>
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-50 text-[#0b57d0] transition-colors group-hover:bg-[#0b57d0] group-hover:text-white">
+              <FolderGit2 className="h-4 w-4" />
+            </div>
+          </div>
+          <div className="mt-4 flex items-baseline gap-2">
+            <span className="text-3xl font-black text-[#0f172a]">{totalProjects}</span>
+            <span className="text-[11px] font-semibold text-cyan-700">Case Studies</span>
+          </div>
+          <div className="mt-3 flex items-center gap-1.5 text-xs font-semibold text-[#0b57d0]">
+            <span>Manage projects</span>
+            <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-1" />
+          </div>
+        </Link>
+
+        {/* Total Blogs Card */}
         <Link
           href="/blog"
           className="group block rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs transition-all duration-200 hover:-translate-y-1 hover:border-purple-300 hover:shadow-md cursor-pointer"

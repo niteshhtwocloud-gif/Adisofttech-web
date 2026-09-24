@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { CalendarDays, User, ArrowLeft, Clock, Share2, Sparkles } from "lucide-react";
 import BlogCard from "@/components/BlogCard";
 import { getAllBlogs, getBlogBySlug } from "@/lib/getBlogs";
+import { enhanceBlogHtml } from "@/utils/media";
 
 export const dynamic = "force-dynamic";
 
@@ -153,89 +154,26 @@ export default async function BlogPostPage({ params }: Props) {
           </div>
         </div>
 
-        {/* Formatted Content (Supports both Rich HTML from WYSIWYG Editor and Markdown) */}
-        {/<[a-z][\s\S]*>/i.test(post.content || "") ? (
-          <div
-            className="space-y-4 text-base leading-relaxed text-slate-700 sm:text-lg sm:leading-8
-              [&_h1]:text-3xl [&_h1]:font-black [&_h1]:text-[#0f172a] [&_h1]:my-4 [&_h1]:tracking-tight
-              [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-[#0f172a] [&_h2]:my-3.5 [&_h2]:tracking-tight
-              [&_h3]:text-xl [&_h3]:font-bold [&_h3]:text-[#0f172a] [&_h3]:my-3
-              [&_strong]:font-bold [&_strong]:text-slate-900 [&_b]:font-bold [&_b]:text-slate-900
-              [&_i]:italic [&_em]:italic
-              [&_u]:underline
-              [&_p]:my-2.5 [&_p]:leading-relaxed
-              [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:my-4 [&_ul_li]:my-1.5
-              [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:my-4 [&_ol_li]:my-1.5
-              [&_blockquote]:border-l-4 [&_blockquote]:border-blue-600 [&_blockquote]:bg-blue-50/50 [&_blockquote]:p-5 [&_blockquote]:rounded-r-2xl [&_blockquote]:italic [&_blockquote]:my-4
-              [&_a]:text-[#0b57d0] [&_a]:underline [&_a]:font-semibold"
-            dangerouslySetInnerHTML={{ __html: post.content }}
-          />
-        ) : (
-          <div className="space-y-6 text-base leading-relaxed text-slate-700 sm:text-lg sm:leading-8">
-            {blocks.map((block, idx) => {
-              const trimmed = block.trim();
-
-              // Heading 2 check (e.g. **1. Heading Title**)
-              if (trimmed.startsWith("**") && trimmed.endsWith("**") && !trimmed.slice(2, -2).includes("\n")) {
-                return (
-                  <h2
-                    key={idx}
-                    className="pt-6 text-2xl font-bold tracking-tight text-[#0f172a] sm:text-3xl"
-                  >
-                    {trimmed.slice(2, -2)}
-                  </h2>
-                );
-              }
-
-              // Bullet list block
-              if (trimmed.startsWith("- ")) {
-                const items = trimmed
-                  .split("\n")
-                  .map((line) => line.replace(/^-\s*/, "").trim())
-                  .filter(Boolean);
-                return (
-                  <ul key={idx} className="my-5 space-y-3 pl-2">
-                    {items.map((item, i) => (
-                      <li key={i} className="flex items-start gap-3 text-slate-700">
-                        <span className="mt-2.5 h-2 w-2 flex-shrink-0 rounded-full bg-blue-600" />
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                );
-              }
-
-              // Final callout if starts with "At ADISOFTTECH" or "The Solution:"
-              if (trimmed.startsWith("At ADISOFTTECH") || trimmed.startsWith("**The Solution:")) {
-                return (
-                  <div
-                    key={idx}
-                    className="my-8 rounded-2xl border-l-4 border-blue-600 bg-slate-50 p-6 sm:p-8"
-                  >
-                    <p className="text-base font-medium leading-relaxed text-slate-800">
-                      {trimmed.replace(/\*\*/g, "")}
-                    </p>
-                    <div className="mt-4">
-                      <Link
-                        href="/#contact"
-                        className="inline-flex items-center gap-2 rounded-full bg-[#0b57d0] px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-blue-600/25 transition hover:bg-blue-700 active:scale-[0.98]"
-                      >
-                        Speak with our Tech Consultants &rarr;
-                      </Link>
-                    </div>
-                  </div>
-                );
-              }
-
-              // Normal paragraph
-              return (
-                <p key={idx} className="text-slate-700">
-                  {trimmed}
-                </p>
-              );
-            })}
-          </div>
-        )}
+        {/* Formatted Content (Supports Rich HTML, Custom Images, and Video Embeds) */}
+        <div
+          className="space-y-4 text-base leading-relaxed text-slate-700 sm:text-lg sm:leading-8
+            [&_h1]:text-3xl [&_h1]:font-black [&_h1]:text-[#0f172a] [&_h1]:my-5 [&_h1]:tracking-tight
+            [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-[#0f172a] [&_h2]:my-4 [&_h2]:tracking-tight
+            [&_h3]:text-xl [&_h3]:font-bold [&_h3]:text-[#0f172a] [&_h3]:my-3
+            [&_strong]:font-bold [&_strong]:text-slate-900 [&_b]:font-bold [&_b]:text-slate-900
+            [&_i]:italic [&_em]:italic
+            [&_u]:underline
+            [&_p]:my-3.5 [&_p]:leading-relaxed
+            [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:my-4 [&_ul_li]:my-1.5
+            [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:my-4 [&_ol_li]:my-1.5
+            [&_blockquote]:border-l-4 [&_blockquote]:border-blue-600 [&_blockquote]:bg-blue-50/50 [&_blockquote]:p-5 [&_blockquote]:rounded-r-2xl [&_blockquote]:italic [&_blockquote]:my-5
+            [&_a]:text-[#0b57d0] [&_a]:underline [&_a]:font-semibold
+            [&_img]:rounded-2xl [&_img]:shadow-md [&_img]:my-6 [&_img]:max-w-full [&_img]:mx-auto [&_img]:h-auto
+            [&_iframe]:w-full [&_iframe]:aspect-video [&_iframe]:rounded-2xl [&_iframe]:my-6 [&_iframe]:shadow-md [&_iframe]:border-0
+            [&_video]:w-full [&_video]:rounded-2xl [&_video]:my-6 [&_video]:shadow-md
+            [&_.ast-video-container]:my-6 [&_.ast-video-container]:rounded-2xl [&_.ast-video-container]:overflow-hidden [&_.ast-video-container]:shadow-md"
+          dangerouslySetInnerHTML={{ __html: enhanceBlogHtml(post.content || "") }}
+        />
       </article>
 
       {/* Related Posts Section */}

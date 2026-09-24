@@ -52,6 +52,43 @@ const projectSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    tagline: {
+      type: String,
+      default: "",
+    },
+    timeline: {
+      type: String,
+      default: "",
+    },
+    fullOverview: {
+      type: String,
+      default: "",
+    },
+    challenge: {
+      type: String,
+      default: "",
+    },
+    solution: {
+      type: String,
+      default: "",
+    },
+    features: {
+      type: [String],
+      default: [],
+    },
+    caseMetrics: [
+      {
+        label: { type: String, default: "" },
+        value: { type: String, default: "" },
+        description: { type: String, default: "" },
+      },
+    ],
+    techStack: [
+      {
+        name: { type: String, default: "" },
+        role: { type: String, default: "" },
+      },
+    ],
   },
   {
     timestamps: true,

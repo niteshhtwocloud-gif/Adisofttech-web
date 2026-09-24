@@ -26,7 +26,8 @@ import {
 import {
   LinkedinIcon,
   FacebookIcon,
-  InstagramIcon,
+  YoutubeIcon,
+  TwitterXIcon,
 } from "./icons/SocialIcons";
 import ASTLogo from "@/components/ASTLogo";
 
@@ -221,7 +222,7 @@ export default function Navbar() {
           <div className="flex items-center gap-5">
             <div className="flex items-center gap-3 text-slate-400">
               <a
-                href="https://linkedin.com"
+                href="https://www.linkedin.com/company/adisofttech"
                 target="_blank"
                 rel="noreferrer"
                 aria-label="LinkedIn"
@@ -230,7 +231,7 @@ export default function Navbar() {
                 <LinkedinIcon className="h-3.5 w-3.5" />
               </a>
               <a
-                href="https://facebook.com"
+                href="https://www.facebook.com/Adisofttech/"
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Facebook"
@@ -239,13 +240,22 @@ export default function Navbar() {
                 <FacebookIcon className="h-3.5 w-3.5" />
               </a>
               <a
-                href="https://instagram.com"
+                href="https://youtube.com/@future_tech_ai_idea?si=1WHMyJBHfVDJG0ixe"
                 target="_blank"
                 rel="noreferrer"
-                aria-label="Instagram"
-                className="transition hover:text-[#f97316]"
+                aria-label="YouTube"
+                className="transition hover:text-[#ef4444]"
               >
-                <InstagramIcon className="h-3.5 w-3.5" />
+                <YoutubeIcon className="h-3.5 w-3.5" />
+              </a>
+              <a
+                href="https://x.com/pradeep_maniray"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="X (Twitter)"
+                className="transition hover:text-slate-900"
+              >
+                <TwitterXIcon className="h-3.5 w-3.5" />
               </a>
             </div>
           </div>
@@ -361,6 +371,46 @@ export default function Navbar() {
                 <span>Get a Free Consultation</span>
                 <ArrowRight className="h-3.5 w-3.5" />
               </Link>
+            </div>
+
+            {/* Mobile Social Links */}
+            <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-center gap-5 text-slate-400">
+              <a
+                href="https://www.linkedin.com/company/adisofttech"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="LinkedIn"
+                className="transition hover:text-[#0b57d0]"
+              >
+                <LinkedinIcon className="h-4 w-4" />
+              </a>
+              <a
+                href="https://www.facebook.com/Adisofttech/"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Facebook"
+                className="transition hover:text-[#0b57d0]"
+              >
+                <FacebookIcon className="h-4 w-4" />
+              </a>
+              <a
+                href="https://youtube.com/@future_tech_ai_idea?si=1WHMyJBHfVDJG0ixe"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="YouTube"
+                className="transition hover:text-[#ef4444]"
+              >
+                <YoutubeIcon className="h-4 w-4" />
+              </a>
+              <a
+                href="https://x.com/pradeep_maniray"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="X (Twitter)"
+                className="transition hover:text-slate-900"
+              >
+                <TwitterXIcon className="h-4 w-4" />
+              </a>
             </div>
           </div>
         )}

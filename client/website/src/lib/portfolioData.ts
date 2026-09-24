@@ -270,7 +270,6 @@ export function getProjectByIdOrSlug(idOrSlug: string | number): CaseStudy | und
 
 export async function fetchProjectByIdOrSlug(idOrSlug: string | number): Promise<CaseStudy | undefined> {
   const local = getProjectByIdOrSlug(idOrSlug);
-  if (local) return local;
 
   try {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
@@ -280,41 +279,50 @@ export async function fetchProjectByIdOrSlug(idOrSlug: string | number): Promise
       if (data.project) {
         const p = data.project;
         return {
-          id: p.order || 999,
+          id: p.order || local?.id || 999,
           slug: p.slug,
           title: p.title,
-          category: p.category || "Custom Software",
-          filterKey: "business",
-          tagline: p.description,
+          category: p.category || local?.category || "Custom Software",
+          filterKey: local?.filterKey || "business",
+          tagline: p.tagline || local?.tagline || p.description,
           description: p.description,
-          fullOverview: p.description,
-          clientIndustry: p.client || "Enterprise Client",
-          timeline: "Production Deployed",
-          tags: p.technologies || [],
-          image: getWebsiteImageUrl(p.image),
-          features: [
+          fullOverview: p.fullOverview || local?.fullOverview || p.description,
+          clientIndustry: p.client || local?.clientIndustry || "Enterprise Client",
+          timeline: p.timeline || local?.timeline || "10 Weeks to Production",
+          tags: p.technologies?.length ? p.technologies : (local?.tags || []),
+          image: getWebsiteImageUrl(p.image || local?.image),
+          features: (p.features && p.features.length) ? p.features : (local?.features || [
             "Bespoke modular architecture configured for high reliability",
             "Role-based access privileges and automated security checks",
             "API-first engineering built for real-time telemetry and sync",
-          ],
+          ]),
           challenge:
+            p.challenge ||
+            local?.challenge ||
             "Modernizing operational workflows and standardizing high-throughput system performance.",
           solution:
+            p.solution ||
+            local?.solution ||
             "AST engineered a bespoke architecture tailored to client infrastructure and scale requirements.",
-          metrics: p.metrics
-            ? [{ label: "Impact", value: p.metrics, description: "Key Result" }]
-            : [{ label: "Production Status", value: "Active", description: "System operational" }],
-          techStack: (p.technologies || []).map((t: string) => ({
-            name: t,
-            role: "Core Technology",
-          })),
+          metrics: (p.caseMetrics && p.caseMetrics.length)
+            ? p.caseMetrics
+            : (local?.metrics || (p.metrics ? [{ label: "Impact", value: p.metrics, description: "Key Result" }] : [{ label: "Production Status", value: "Active", description: "System operational" }])),
+          techStack: (p.techStack && p.techStack.length)
+            ? p.techStack
+            : (p.technologies || []).length
+              ? (p.technologies || []).map((t: string) => ({
+                  name: t,
+                  role: "Core Technology",
+                }))
+              : (local?.techStack || []),
         };
       }
     }
   } catch (err) {
     console.warn("Could not fetch remote project:", err);
   }
-  return undefined;
+
+  return local;
 }
 
 export function getAllProjects(): CaseStudy[] {

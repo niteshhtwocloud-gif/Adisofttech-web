@@ -1,18 +1,88 @@
 // SMTP email transport and notification service for consultation inquiries.
 import nodemailer from "nodemailer";
 import config from "../config/env.js";
+import Settings from "../models/settings.model.js";
 
-let transporter = null;
+let cachedTransporter = null;
+let lastEmailUser = null;
+let lastEmailPass = null;
 
-if (config.emailUser && config.emailPass) {
-  transporter = nodemailer.createTransport({
+/**
+ * Retrieves the current effective email configuration.
+ * Checks MongoDB Settings first, falling back to environment config.
+ */
+export const getEmailConfig = async () => {
+  let emailUser = config.emailUser || "";
+  let emailPass = config.emailPass || "";
+  let emailTo = config.emailTo || "";
+
+  try {
+    const settings = await Settings.findOne().lean();
+    if (settings) {
+      if (settings.emailUser && settings.emailUser.trim()) {
+        emailUser = settings.emailUser.trim();
+      }
+      if (settings.emailPass && settings.emailPass.trim()) {
+        emailPass = settings.emailPass.trim();
+      }
+      if (settings.emailTo && settings.emailTo.trim()) {
+        emailTo = settings.emailTo.trim();
+      }
+    }
+  } catch (err) {
+    console.warn("Could not load email settings from DB, using env fallback:", err.message);
+  }
+
+  return { emailUser, emailPass, emailTo };
+};
+
+/**
+ * Creates or retrieves a cached Nodemailer transporter instance.
+ * @param {Object} [overrideCreds] - Optional temporary credentials for verification.
+ */
+export const getTransporter = async (overrideCreds = null) => {
+  const creds = overrideCreds || (await getEmailConfig());
+  const { emailUser, emailPass } = creds;
+
+  if (!emailUser || !emailPass) {
+    return null;
+  }
+
+  // Reuse cached transporter if credentials haven't changed
+  if (
+    !overrideCreds &&
+    cachedTransporter &&
+    lastEmailUser === emailUser &&
+    lastEmailPass === emailPass
+  ) {
+    return cachedTransporter;
+  }
+
+  const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-      user: config.emailUser,
-      pass: config.emailPass,
+      user: emailUser,
+      pass: emailPass,
     },
   });
-}
+
+  if (!overrideCreds) {
+    cachedTransporter = transporter;
+    lastEmailUser = emailUser;
+    lastEmailPass = emailPass;
+  }
+
+  return transporter;
+};
+
+/**
+ * Clears the cached transporter instance so next call re-evaluates configuration.
+ */
+export const resetTransporter = () => {
+  cachedTransporter = null;
+  lastEmailUser = null;
+  lastEmailPass = null;
+};
 
 // Sends styled HTML email alert when new contact inquiry is submitted.
 export const sendContactNotification = async ({
@@ -23,12 +93,15 @@ export const sendContactNotification = async ({
   service,
   message,
 }) => {
-  if (!transporter) {
+  const { emailUser, emailPass, emailTo } = await getEmailConfig();
+  const transporter = await getTransporter();
+
+  if (!transporter || !emailUser || !emailPass) {
     console.log("Email transporter not configured. Skipping email dispatch.");
     return false;
   }
 
-  const recipient = config.emailTo || config.emailUser;
+  const recipient = emailTo || emailUser;
   const subject = `🚀 New AST Consultation Request: ${company || name}`;
 
   const html = `
@@ -113,12 +186,12 @@ export const sendContactNotification = async ({
 
   try {
     await transporter.sendMail({
-      from: `"AdiSofTech Lead Engine" <${config.emailUser}>`,
+      from: `"AdiSofTech Lead Engine" <${emailUser}>`,
       to: recipient,
       subject,
       html,
     });
-    console.log(`Email notification sent to ${recipient}`);
+    console.log(`Email notification sent to ${recipient} via ${emailUser}`);
     return true;
   } catch (err) {
     console.error("Failed to send contact notification email:", err.message);
@@ -128,7 +201,10 @@ export const sendContactNotification = async ({
 
 // Sends professional AST-branded HTML email with 6-digit OTP code for administrator password reset.
 export const sendPasswordResetOtpEmail = async ({ email, name, otp }) => {
-  if (!transporter) {
+  const { emailUser, emailPass } = await getEmailConfig();
+  const transporter = await getTransporter();
+
+  if (!transporter || !emailUser || !emailPass) {
     console.log("Email transporter not configured. Cannot dispatch OTP email.");
     return false;
   }
@@ -182,7 +258,7 @@ export const sendPasswordResetOtpEmail = async ({ email, name, otp }) => {
 
   try {
     await transporter.sendMail({
-      from: `"AdiSofTech Security" <${config.emailUser}>`,
+      from: `"AdiSofTech Security" <${emailUser}>`,
       to: email,
       subject,
       html,
@@ -195,3 +271,70 @@ export const sendPasswordResetOtpEmail = async ({ email, name, otp }) => {
   }
 };
 
+/**
+ * Dispatches a verification test email to verify configured or tested SMTP credentials.
+ */
+export const sendTestEmail = async ({ to, emailUser, emailPass } = {}) => {
+  let transporter;
+  let sender = emailUser;
+
+  if (emailUser && emailPass) {
+    transporter = await getTransporter({ emailUser, emailPass });
+  } else {
+    const creds = await getEmailConfig();
+    sender = creds.emailUser;
+    transporter = await getTransporter();
+  }
+
+  if (!transporter || !sender) {
+    throw new Error("SMTP credentials are not configured. Please supply Sender Email and Google App Password.");
+  }
+
+  const recipient = to || sender;
+  const subject = "🧪 AdiSofTech SMTP Verification Test Email";
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 28px 12px; color: #0f172a;">
+      <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 520px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.06); border: 1px solid #e2e8f0;">
+        <tr>
+          <td style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 28px 24px; text-align: center;">
+            <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 800;">SMTP Test Successful! ✅</h1>
+            <p style="color: rgba(255,255,255,0.95); margin: 6px 0 0 0; font-size: 13px;">AdiSofTech Email Service Verification</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 28px 24px;">
+            <p style="color: #334155; font-size: 14px; line-height: 1.6; margin: 0 0 18px 0;">
+              This email confirms that your <strong>Sender Gmail</strong> and <strong>Google App Password</strong> are configured properly and can send emails without issues.
+            </p>
+            <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 14px 18px; margin-bottom: 20px;">
+              <p style="margin: 0 0 6px 0; font-size: 12px; font-weight: 700; color: #166534; text-transform: uppercase;">Configuration Verified:</p>
+              <p style="margin: 0; font-size: 13px; color: #15803d;">• Dispatched from: <strong>${sender}</strong></p>
+              <p style="margin: 4px 0 0 0; font-size: 13px; color: #15803d;">• Delivered to: <strong>${recipient}</strong></p>
+              <p style="margin: 4px 0 0 0; font-size: 12px; color: #64748b;">• Timestamp: ${new Date().toLocaleString()}</p>
+            </div>
+            <p style="color: #64748b; font-size: 12px; line-height: 1.5; margin: 0;">
+              Incoming contact form submissions and password reset OTPs will now be delivered via this connection.
+            </p>
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `;
+
+  await transporter.sendMail({
+    from: `"AdiSofTech Admin Test" <${sender}>`,
+    to: recipient,
+    subject,
+    html,
+  });
+
+  return { success: true, recipient, sender };
+};

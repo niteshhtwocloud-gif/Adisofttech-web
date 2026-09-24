@@ -91,6 +91,20 @@ export const api = {
       return { success: false, projects: [] };
     }
   },
+
+  // Fetch site settings including heroSlides
+  async getSettings() {
+    try {
+      const res = await fetch(`${API_BASE_URL}/settings`, {
+        cache: "no-store",
+      });
+      if (!res.ok) throw new Error("Failed to fetch settings");
+      return await res.json();
+    } catch (error) {
+      console.error("api.getSettings error:", error);
+      return { success: false, settings: null };
+    }
+  },
 };
 
 export default api;

@@ -33,6 +33,35 @@ const settingsSchema = new mongoose.Schema(
       default: "West Bengal, India",
       trim: true,
     },
+    emailUser: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    emailPass: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    emailTo: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    heroSlides: {
+      type: [
+        {
+          title: { type: String, default: "" },
+          subtitle: { type: String, default: "" },
+          badge: { type: String, default: "" },
+          image: { type: String, default: "" },
+          link: { type: String, default: "/#contact" },
+          order: { type: Number, default: 0 },
+          active: { type: Boolean, default: true },
+        },
+      ],
+      default: [],
+    },
   },
   {
     timestamps: true,

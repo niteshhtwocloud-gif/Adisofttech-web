@@ -289,6 +289,13 @@ class AdminApiClient {
       body: JSON.stringify(data),
     });
   }
+
+  async testEmail(data: { to?: string; emailUser?: string; emailPass?: string } = {}) {
+    return this.request("/settings/test-email", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
 }
 
 export const adminApi = new AdminApiClient();

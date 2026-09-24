@@ -10,4 +10,7 @@ router.get("/", settingsController.getSettings);
 // Protected: Update site settings, brand logo, company info
 router.put("/", authenticate, settingsController.updateSettings);
 
+// Protected: Test email configuration and SMTP connection
+router.post("/test-email", authenticate, settingsController.testEmailConnection);
+
 export default router;

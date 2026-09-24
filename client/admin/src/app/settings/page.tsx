@@ -18,12 +18,19 @@ import {
   Sparkles,
   Save,
   Layers,
+  Send,
+  HelpCircle,
+  Check,
+  Info,
+  RefreshCw,
+  Inbox,
+  AtSign,
 } from "lucide-react";
 import adminApi from "@/services/api";
 import ImageUpload from "@/components/common/ImageUpload";
 
 export default function AdminSettingsPage() {
-  const [activeTab, setActiveTab] = useState<"profile" | "branding">("profile");
+  const [activeTab, setActiveTab] = useState<"profile" | "branding" | "email">("profile");
 
   // Profile State
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -56,6 +63,22 @@ export default function AdminSettingsPage() {
   const [brandSuccess, setBrandSuccess] = useState("");
   const [brandError, setBrandError] = useState("");
 
+  // Email & SMTP Configuration State (.env synchronized)
+  const [emailTo, setEmailTo] = useState("");
+  const [emailUser, setEmailUser] = useState("");
+  const [emailPass, setEmailPass] = useState("");
+  const [hasEmailPass, setHasEmailPass] = useState(false);
+  const [showEmailPass, setShowEmailPass] = useState(false);
+  const [emailLoading, setEmailLoading] = useState(false);
+  const [emailSuccess, setEmailSuccess] = useState("");
+  const [emailError, setEmailError] = useState("");
+
+  // Test Email Verification State
+  const [testEmailTarget, setTestEmailTarget] = useState("");
+  const [isTestingEmail, setIsTestingEmail] = useState(false);
+  const [testSuccess, setTestSuccess] = useState("");
+  const [testError, setTestError] = useState("");
+
   // Load User & Settings on Mount
   useEffect(() => {
     // 1. Load Admin User
@@ -79,9 +102,9 @@ export default function AdminSettingsPage() {
           adminApi.setUser(res.user);
         }
       })
-      .catch(() => {});
+      .catch(() => { });
 
-    // 2. Load Brand Settings
+    // 2. Load Brand & Email Settings
     adminApi
       .getSettings()
       .then((res: any) => {
@@ -93,9 +116,18 @@ export default function AdminSettingsPage() {
           if (s.supportEmail) setSupportEmail(s.supportEmail);
           if (s.phone) setPhone(s.phone);
           if (s.address) setAddress(s.address);
+
+          // Email & SMTP fields
+          if (s.emailTo) {
+            setEmailTo(s.emailTo);
+            setTestEmailTarget(s.emailTo);
+          }
+          if (s.emailUser) setEmailUser(s.emailUser);
+          if (s.emailPass) setEmailPass(s.emailPass);
+          if (s.hasEmailPass) setHasEmailPass(s.hasEmailPass);
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   // Handle Profile Update
@@ -140,15 +172,19 @@ export default function AdminSettingsPage() {
     setPasswordSuccess("");
 
     if (!currentPassword) {
-      setPasswordError("Please enter your current password.");
+      setPasswordError("Current password is required.");
       return;
     }
-    if (!newPassword || newPassword.length < 6) {
-      setPasswordError("New password must be at least 6 characters long.");
+    if (!newPassword) {
+      setPasswordError("New password is required.");
+      return;
+    }
+    if (newPassword.length < 6) {
+      setPasswordError("New password must be at least 6 characters.");
       return;
     }
     if (newPassword !== confirmPassword) {
-      setPasswordError("New password and confirmation do not match.");
+      setPasswordError("New passwords do not match.");
       return;
     }
 
@@ -158,11 +194,11 @@ export default function AdminSettingsPage() {
         currentPassword,
         newPassword,
       });
-      setPasswordSuccess("Your password has been changed successfully!");
+      setPasswordSuccess("Password changed successfully!");
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
-      setTimeout(() => setPasswordSuccess(""), 5000);
+      setTimeout(() => setPasswordSuccess(""), 4000);
     } catch (err: any) {
       setPasswordError(err.message || "Failed to change password.");
     } finally {
@@ -179,12 +215,12 @@ export default function AdminSettingsPage() {
     setBrandLoading(true);
     try {
       await adminApi.updateSettings({
-        companyName,
-        tagline,
-        logo,
-        supportEmail,
-        phone,
-        address,
+        companyName: companyName.trim(),
+        tagline: tagline.trim(),
+        logo: logo.trim(),
+        supportEmail: supportEmail.trim(),
+        phone: phone.trim(),
+        address: address.trim(),
       });
       setBrandSuccess("Brand & System Settings saved successfully!");
       setTimeout(() => setBrandSuccess(""), 4000);
@@ -195,14 +231,87 @@ export default function AdminSettingsPage() {
     }
   };
 
+  // Handle Email & SMTP Settings Update (Syncs with server/.env)
+  const handleUpdateEmailSettings = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setEmailError("");
+    setEmailSuccess("");
+
+    if (!emailTo.trim()) {
+      setEmailError("Recipient Email address (EMAIL_TO) is required.");
+      return;
+    }
+    if (!emailUser.trim()) {
+      setEmailError("Sender Gmail address (EMAIL_USER) is required.");
+      return;
+    }
+
+    setEmailLoading(true);
+    try {
+      const payload: any = {
+        emailTo: emailTo.trim(),
+        emailUser: emailUser.trim(),
+      };
+
+      // Only dispatch new password if the user entered an actual new one
+      if (emailPass && !emailPass.includes("••••")) {
+        payload.emailPass = emailPass.trim().replace(/\s+/g, "");
+      }
+
+      const res: any = await adminApi.updateSettings(payload);
+      setEmailSuccess("Email & SMTP settings saved and synchronized with server/.env successfully!");
+      if (res.settings) {
+        if (res.settings.emailPass) setEmailPass(res.settings.emailPass);
+        if (res.settings.hasEmailPass) setHasEmailPass(res.settings.hasEmailPass);
+      }
+      setTimeout(() => setEmailSuccess(""), 5000);
+    } catch (err: any) {
+      setEmailError(err.message || "Failed to save email settings.");
+    } finally {
+      setEmailLoading(false);
+    }
+  };
+
+  // Handle Test Email Verification Dispatch
+  const handleSendTestEmail = async () => {
+    setTestError("");
+    setTestSuccess("");
+
+    const target = testEmailTarget.trim() || emailTo.trim() || emailUser.trim();
+    if (!target) {
+      setTestError("Please enter a destination email address to receive the test email.");
+      return;
+    }
+
+    setIsTestingEmail(true);
+    try {
+      const payload: any = {
+        to: target,
+        emailUser: emailUser.trim() || undefined,
+      };
+
+      if (emailPass && !emailPass.includes("••••")) {
+        payload.emailPass = emailPass.trim().replace(/\s+/g, "");
+      }
+
+      const res: any = await adminApi.testEmail(payload);
+      setTestSuccess(res.message || `Test email dispatched successfully to ${target}!`);
+      setTimeout(() => setTestSuccess(""), 6000);
+    } catch (err: any) {
+      setTestError(err.message || "Failed to send test email. Please check your credentials.");
+    } finally {
+      setIsTestingEmail(false);
+    }
+  };
+
   return (
-    <div className="space-y-6 max-w-5xl mx-auto pb-12">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-xl font-extrabold text-[#0f172a]">Settings &amp; Administration</h1>
           <p className="text-xs text-slate-500">
-            Manage your admin profile, update your security password, and configure brand assets.
+            Manage your admin profile, brand identity, and SMTP email settings with .env synchronization.
           </p>
         </div>
 
@@ -211,11 +320,10 @@ export default function AdminSettingsPage() {
           <button
             type="button"
             onClick={() => setActiveTab("profile")}
-            className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-bold transition-all ${
-              activeTab === "profile"
+            className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-bold transition-all cursor-pointer ${activeTab === "profile"
                 ? "bg-white text-[#0b57d0] shadow-xs"
                 : "text-slate-600 hover:text-slate-900"
-            }`}
+              }`}
           >
             <User className="h-3.5 w-3.5" />
             <span>Profile &amp; Security</span>
@@ -223,14 +331,24 @@ export default function AdminSettingsPage() {
           <button
             type="button"
             onClick={() => setActiveTab("branding")}
-            className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-bold transition-all ${
-              activeTab === "branding"
+            className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-bold transition-all cursor-pointer ${activeTab === "branding"
                 ? "bg-white text-[#0b57d0] shadow-xs"
                 : "text-slate-600 hover:text-slate-900"
-            }`}
+              }`}
           >
             <Building className="h-3.5 w-3.5" />
-            <span>Brand &amp; Logo Settings</span>
+            <span>Brand &amp; Logo</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("email")}
+            className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-bold transition-all cursor-pointer ${activeTab === "email"
+                ? "bg-white text-[#0b57d0] shadow-xs"
+                : "text-slate-600 hover:text-slate-900"
+              }`}
+          >
+            <Mail className="h-3.5 w-3.5" />
+            <span>Email &amp; SMTP (.env)</span>
           </button>
         </div>
       </div>
@@ -266,53 +384,58 @@ export default function AdminSettingsPage() {
               )}
 
               <form onSubmit={handleUpdateProfile} className="space-y-4">
-                {/* Avatar Upload */}
-                <ImageUpload
-                  value={avatar}
-                  onChange={(url) => setAvatar(url)}
-                  label="Profile Avatar / Photo"
-                  placeholder="https://example.com/avatar.jpg"
-                />
+                {/* Avatar Uploader */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    Profile Avatar
+                  </label>
+                  <ImageUpload
+                    value={avatar}
+                    onChange={(url) => setAvatar(url)}
+                    folder="ast-admin/avatars"
+                  />
+                  <p className="text-[11px] text-slate-400 mt-1">
+                    Upload a square PNG/JPG or avatar icon.
+                  </p>
+                </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* Name */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-700">Full Name</label>
-                    <input
-                      type="text"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="e.g. AST Administrator"
-                      className="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 py-2.5 text-xs text-slate-900 outline-none transition-colors focus:border-[#0b57d0] focus:bg-white"
-                      required
-                    />
-                  </div>
+                {/* Full Name */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    Full Name <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="e.g. Administrator"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 py-2.5 text-xs text-slate-900 outline-none transition-colors focus:border-[#0b57d0] focus:bg-white"
+                  />
+                </div>
 
-                  {/* Email */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-700">Email Address</label>
+                {/* Email Address */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    Admin Email Address <span className="text-rose-500">*</span>
+                  </label>
+                  <div className="relative">
                     <input
                       type="email"
+                      required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="admin@adisofttech.com"
-                      className="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 py-2.5 text-xs text-slate-900 outline-none transition-colors focus:border-[#0b57d0] focus:bg-white"
-                      required
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 py-2.5 pl-9 text-xs text-slate-900 outline-none transition-colors focus:border-[#0b57d0] focus:bg-white"
                     />
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
                   </div>
+                  <p className="text-[11px] text-slate-400 mt-1">
+                    Used for logging into this admin panel and receiving password recovery OTPs.
+                  </p>
                 </div>
 
-                {/* Role Badge */}
-                <div className="flex items-center justify-between rounded-2xl bg-slate-50 p-3.5 border border-slate-100">
-                  <div className="flex items-center gap-2">
-                    <Shield className="h-4 w-4 text-[#0b57d0]" />
-                    <span className="text-xs font-semibold text-slate-700">Account Access Role</span>
-                  </div>
-                  <span className="rounded-full bg-blue-50 px-2.5 py-0.5 text-[10px] font-bold text-[#0b57d0]">
-                    {currentUser?.role?.toUpperCase() || "SUPER ADMIN"}
-                  </span>
-                </div>
-
+                {/* Submit Profile */}
                 <div className="pt-2">
                   <button
                     type="submit"
@@ -322,7 +445,7 @@ export default function AdminSettingsPage() {
                     {profileLoading ? (
                       <>
                         <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                        <span>Saving Profile...</span>
+                        <span>Updating Profile...</span>
                       </>
                     ) : (
                       <>
@@ -340,12 +463,12 @@ export default function AdminSettingsPage() {
           <div className="lg:col-span-5 space-y-6">
             <div className="rounded-3xl border border-slate-200/80 bg-white p-6 sm:p-7 shadow-xs space-y-6">
               <div className="flex items-center gap-3 border-b border-slate-100 pb-5">
-                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-50 text-amber-600">
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-orange-50 text-[#ea580c]">
                   <KeyRound className="h-5 w-5" />
                 </div>
                 <div>
-                  <h2 className="text-sm font-bold text-[#0f172a]">Change Security Password</h2>
-                  <p className="text-xs text-slate-500">Update your account login password</p>
+                  <h2 className="text-sm font-bold text-[#0f172a]">Security &amp; Password</h2>
+                  <p className="text-xs text-slate-500">Update your account authentication credentials</p>
                 </div>
               </div>
 
@@ -365,79 +488,86 @@ export default function AdminSettingsPage() {
 
               <form onSubmit={handleChangePassword} className="space-y-4">
                 {/* Current Password */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700">Current Password</label>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    Current Password <span className="text-rose-500">*</span>
+                  </label>
                   <div className="relative">
                     <input
                       type={showCurrentPass ? "text" : "password"}
+                      required
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
-                      placeholder="Enter current password"
-                      className="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 py-2.5 pr-10 text-xs text-slate-900 outline-none transition-colors focus:border-[#0b57d0] focus:bg-white"
-                      required
+                      placeholder="••••••••••••"
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 py-2.5 pl-9 pr-10 text-xs text-slate-900 outline-none transition-colors focus:border-[#0b57d0] focus:bg-white"
                     />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
                     <button
                       type="button"
                       onClick={() => setShowCurrentPass(!showCurrentPass)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                     >
-                      {showCurrentPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      {showCurrentPass ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
                     </button>
                   </div>
                 </div>
 
                 {/* New Password */}
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <label className="text-xs font-bold text-slate-700">New Password</label>
-                    <span className="text-[11px] text-slate-400">Min 6 characters</span>
-                  </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    New Password <span className="text-rose-500">*</span>
+                  </label>
                   <div className="relative">
                     <input
                       type={showNewPass ? "text" : "password"}
+                      required
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      placeholder="Enter new password"
-                      className="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 py-2.5 pr-10 text-xs text-slate-900 outline-none transition-colors focus:border-[#0b57d0] focus:bg-white"
-                      required
+                      placeholder="At least 6 characters"
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 py-2.5 pl-9 pr-10 text-xs text-slate-900 outline-none transition-colors focus:border-[#0b57d0] focus:bg-white"
                     />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
                     <button
                       type="button"
                       onClick={() => setShowNewPass(!showNewPass)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                     >
-                      {showNewPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      {showNewPass ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
                     </button>
                   </div>
                 </div>
 
                 {/* Confirm New Password */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700">Confirm New Password</label>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    Confirm New Password <span className="text-rose-500">*</span>
+                  </label>
                   <div className="relative">
                     <input
                       type={showConfirmPass ? "text" : "password"}
+                      required
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      placeholder="Repeat new password"
-                      className="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 py-2.5 pr-10 text-xs text-slate-900 outline-none transition-colors focus:border-[#0b57d0] focus:bg-white"
-                      required
+                      placeholder="Confirm your new password"
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 py-2.5 pl-9 pr-10 text-xs text-slate-900 outline-none transition-colors focus:border-[#0b57d0] focus:bg-white"
                     />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
                     <button
                       type="button"
                       onClick={() => setShowConfirmPass(!showConfirmPass)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                     >
-                      {showConfirmPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      {showConfirmPass ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
                     </button>
                   </div>
                 </div>
 
+                {/* Submit Password */}
                 <div className="pt-2">
                   <button
                     type="submit"
                     disabled={passwordLoading}
-                    className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-black transition-colors disabled:opacity-50 cursor-pointer"
+                    className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-5 py-2.5 text-xs font-bold text-white hover:bg-black transition-colors disabled:opacity-50 cursor-pointer"
                   >
                     {passwordLoading ? (
                       <>
@@ -446,8 +576,8 @@ export default function AdminSettingsPage() {
                       </>
                     ) : (
                       <>
-                        <Lock className="h-3.5 w-3.5" />
-                        <span>Update Security Password</span>
+                        <Shield className="h-3.5 w-3.5" />
+                        <span>Update Password</span>
                       </>
                     )}
                   </button>
@@ -460,16 +590,14 @@ export default function AdminSettingsPage() {
 
       {/* ============================== TAB 2: BRAND & LOGO SETTINGS ============================== */}
       {activeTab === "branding" && (
-        <div className="rounded-3xl border border-slate-200/80 bg-white p-6 sm:p-8 shadow-xs space-y-6">
+        <div className="max-w-4xl rounded-3xl border border-slate-200/80 bg-white p-6 sm:p-8 shadow-xs space-y-6">
           <div className="flex items-center gap-3 border-b border-slate-100 pb-5">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-purple-50 text-purple-600">
               <Building className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-sm font-bold text-[#0f172a]">Company &amp; Brand Identity</h2>
-              <p className="text-xs text-slate-500">
-                Upload your official brand logo and manage public contact credentials
-              </p>
+              <h2 className="text-sm font-bold text-[#0f172a]">Brand Identity &amp; System Info</h2>
+              <p className="text-xs text-slate-500">Configure global website logo, brand name, and public contact coordinates</p>
             </div>
           </div>
 
@@ -487,51 +615,31 @@ export default function AdminSettingsPage() {
             </div>
           )}
 
-          <form onSubmit={handleUpdateBrand} className="space-y-6">
-            {/* Logo Section */}
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
-              <div className="md:col-span-8">
-                <ImageUpload
-                  value={logo}
-                  onChange={(url) => setLogo(url)}
-                  label="Official Company Logo (PNG / SVG / WEBP recommended)"
-                  placeholder="/images/ast-logo.png"
-                />
-              </div>
-
-              {/* Logo Live Preview */}
-              <div className="md:col-span-4 rounded-2xl border border-slate-100 bg-slate-50/80 p-4 space-y-3">
-                <span className="text-xs font-bold text-slate-700 block">Current Logo Preview</span>
-                <div className="flex h-28 w-full items-center justify-center rounded-xl border border-dashed border-slate-200 bg-white p-3">
-                  {logo ? (
-                    <img
-                      src={logo}
-                      alt="Brand Logo Preview"
-                      className="max-h-full max-w-full object-contain"
-                      onError={(e) => {
-                        (e.target as any).src = "/images/ast-logo.png";
-                      }}
-                    />
-                  ) : (
-                    <span className="text-xs text-slate-400">No logo uploaded</span>
-                  )}
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setLogo("/images/ast-logo.png")}
-                  className="text-[11px] font-semibold text-[#0b57d0] hover:underline"
-                >
-                  Reset to Default AST Logo
-                </button>
-              </div>
+          <form onSubmit={handleUpdateBrand} className="space-y-5">
+            {/* Logo Uploader */}
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                Brand Logo
+              </label>
+              <ImageUpload
+                value={logo}
+                onChange={(url) => setLogo(url)}
+                folder="ast-admin/brand"
+              />
+              <p className="text-[11px] text-slate-400 mt-1">
+                Upload your transparent PNG/SVG header logo. Recommended dimensions: 240x60px.
+              </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Company Name */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700">Company / Organization Name</label>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Company Name <span className="text-rose-500">*</span>
+                </label>
                 <input
                   type="text"
+                  required
                   value={companyName}
                   onChange={(e) => setCompanyName(e.target.value)}
                   placeholder="AdiSofTech"
@@ -539,9 +647,25 @@ export default function AdminSettingsPage() {
                 />
               </div>
 
+              {/* Tagline */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Tagline / Brand Mission
+                </label>
+                <input
+                  type="text"
+                  value={tagline}
+                  onChange={(e) => setTagline(e.target.value)}
+                  placeholder="Empowering Enterprises with Scalable Software"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 py-2.5 text-xs text-slate-900 outline-none transition-colors focus:border-[#0b57d0] focus:bg-white"
+                />
+              </div>
+
               {/* Support Email */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700">Official Support Email</label>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Public Support Email
+                </label>
                 <div className="relative">
                   <input
                     type="email"
@@ -554,21 +678,11 @@ export default function AdminSettingsPage() {
                 </div>
               </div>
 
-              {/* Tagline */}
-              <div className="sm:col-span-2 space-y-1.5">
-                <label className="text-xs font-bold text-slate-700">Brand Tagline / Headline</label>
-                <input
-                  type="text"
-                  value={tagline}
-                  onChange={(e) => setTagline(e.target.value)}
-                  placeholder="Empowering Enterprises with Scalable Software & Cloud Solutions"
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 py-2.5 text-xs text-slate-900 outline-none transition-colors focus:border-[#0b57d0] focus:bg-white"
-                />
-              </div>
-
               {/* Phone */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700">Contact Phone Number</label>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Public Phone Number
+                </label>
                 <div className="relative">
                   <input
                     type="text"
@@ -581,9 +695,11 @@ export default function AdminSettingsPage() {
                 </div>
               </div>
 
-              {/* Office Address */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700">Registered Office Address</label>
+              {/* Address */}
+              <div className="md:col-span-2">
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Corporate Head Office Address
+                </label>
                 <div className="relative">
                   <input
                     type="text"
@@ -617,6 +733,257 @@ export default function AdminSettingsPage() {
               </button>
             </div>
           </form>
+        </div>
+      )}
+
+      {/* ============================== TAB 3: EMAIL & SMTP SETTINGS (.env AUTO-SYNC) ============================== */}
+      {activeTab === "email" && (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Left Column: Email Configuration Form */}
+          <div className="lg:col-span-7 space-y-6">
+            <div className="rounded-3xl border border-slate-200/80 bg-white p-6 sm:p-7 shadow-xs space-y-6">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-5">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-50 text-[#0b57d0]">
+                    <Mail className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h2 className="text-sm font-bold text-[#0f172a]">Email &amp; SMTP Credentials</h2>
+                    <p className="text-xs text-slate-500">Configure Contact Form receiver email &amp; Google App Password</p>
+                  </div>
+                </div>
+
+                <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[11px] font-bold text-emerald-700">
+                  <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span>Syncs to .env</span>
+                </div>
+              </div>
+
+              {emailSuccess && (
+                <div className="flex items-center gap-2.5 rounded-2xl bg-emerald-50 border border-emerald-200 p-3.5 text-xs text-emerald-800 font-medium">
+                  <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
+                  <span>{emailSuccess}</span>
+                </div>
+              )}
+
+              {emailError && (
+                <div className="flex items-center gap-2.5 rounded-2xl bg-rose-50 border border-rose-200 p-3.5 text-xs text-rose-800 font-medium">
+                  <AlertCircle className="h-4 w-4 shrink-0 text-rose-600" />
+                  <span>{emailError}</span>
+                </div>
+              )}
+
+              <form onSubmit={handleUpdateEmailSettings} className="space-y-5">
+                {/* Recipient Email (Where contact leads go) */}
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-xs font-bold text-slate-700">
+                      Contact Form Receiver Email (<code className="text-[#0b57d0] font-mono text-[11px]">EMAIL_TO</code>) <span className="text-rose-500">*</span>
+                    </label>
+                    <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Destination</span>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type="email"
+                      required
+                      value={emailTo}
+                      onChange={(e) => setEmailTo(e.target.value)}
+                      placeholder="e.g. niteshgupta919843@gmail.com"
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 py-2.5 pl-9 text-xs text-slate-900 outline-none transition-colors focus:border-[#0b57d0] focus:bg-white"
+                    />
+                    <Inbox className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+                  </div>
+                  <p className="text-[11px] text-slate-500 mt-1">
+                    Website ke Contact Form se aane wali saari leads aur inquiries is email address par deliver hongi.
+                  </p>
+                </div>
+
+                {/* Sender Gmail (Dispatch address) */}
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-xs font-bold text-slate-700">
+                      Sender Gmail Address (<code className="text-[#0b57d0] font-mono text-[11px]">EMAIL_USER</code>) <span className="text-rose-500">*</span>
+                    </label>
+                    <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Dispatcher</span>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type="email"
+                      required
+                      value={emailUser}
+                      onChange={(e) => setEmailUser(e.target.value)}
+                      placeholder="e.g. niteshgupta919843@gmail.com"
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 py-2.5 pl-9 text-xs text-slate-900 outline-none transition-colors focus:border-[#0b57d0] focus:bg-white"
+                    />
+                    <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+                  </div>
+                  <p className="text-[11px] text-slate-500 mt-1">
+                    Is Gmail account ke zariye emails bheje jayenge. Google App Password is account ka hona chahiye.
+                  </p>
+                </div>
+
+                {/* Google App Password */}
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-xs font-bold text-slate-700">
+                      Google App Password (<code className="text-[#0b57d0] font-mono text-[11px]">EMAIL_PASS</code>)
+                    </label>
+                    {hasEmailPass ? (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                        <Check className="h-3 w-3" /> Password Active in .env
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+                        Not Configured
+                      </span>
+                    )}
+                  </div>
+                  <div className="relative">
+                    <input
+                      type={showEmailPass ? "text" : "password"}
+                      value={emailPass}
+                      onChange={(e) => setEmailPass(e.target.value)}
+                      placeholder={hasEmailPass ? "•••••••••••••••• (Leave blank to keep existing)" : "16-digit Google App Password"}
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 py-2.5 pl-9 pr-10 text-xs font-mono text-slate-900 outline-none transition-colors focus:border-[#0b57d0] focus:bg-white"
+                    />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+                    <button
+                      type="button"
+                      onClick={() => setShowEmailPass(!showEmailPass)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                    >
+                      {showEmailPass ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                    </button>
+                  </div>
+                  <p className="text-[11px] text-slate-500 mt-1">
+                    Google 16-character App Password (e.g. <code className="bg-slate-100 px-1 py-0.5 rounded text-slate-700 font-mono">gotlxybokxlalruf</code>). Agar purana password hi rakhna hai to isko khali chhod dein.
+                  </p>
+                </div>
+
+                {/* Submit Email Settings */}
+                <div className="pt-2 flex items-center justify-between">
+                  <button
+                    type="submit"
+                    disabled={emailLoading}
+                    className="inline-flex items-center gap-2 rounded-xl bg-[#0b57d0] px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-blue-600/20 hover:bg-blue-700 transition-colors disabled:opacity-50 cursor-pointer"
+                  >
+                    {emailLoading ? (
+                      <>
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        <span>Saving &amp; Syncing .env...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Save className="h-3.5 w-3.5" />
+                        <span>Save &amp; Sync to .env</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          {/* Right Column: Verification Test Card & Instructions */}
+          <div className="lg:col-span-5 space-y-6">
+            {/* Test Email Verification Box */}
+            <div className="rounded-3xl border border-slate-200/80 bg-white p-6 sm:p-7 shadow-xs space-y-5">
+              <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
+                  <Send className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-[#0f172a]">Test SMTP Dispatch</h3>
+                  <p className="text-xs text-slate-500">Ek test email bhej kar verify karein</p>
+                </div>
+              </div>
+
+              {testSuccess && (
+                <div className="flex items-start gap-2.5 rounded-2xl bg-emerald-50 border border-emerald-200 p-3.5 text-xs text-emerald-800 font-medium">
+                  <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600 mt-0.5" />
+                  <span>{testSuccess}</span>
+                </div>
+              )}
+
+              {testError && (
+                <div className="flex items-start gap-2.5 rounded-2xl bg-rose-50 border border-rose-200 p-3.5 text-xs text-rose-800 font-medium">
+                  <AlertCircle className="h-4 w-4 shrink-0 text-rose-600 mt-0.5" />
+                  <span>{testError}</span>
+                </div>
+              )}
+
+              <div className="space-y-3">
+                <label className="block text-xs font-bold text-slate-700">
+                  Send Test Email To:
+                </label>
+                <div className="relative">
+                  <input
+                    type="email"
+                    value={testEmailTarget}
+                    onChange={(e) => setTestEmailTarget(e.target.value)}
+                    placeholder="Enter email to receive test message"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 py-2.5 pl-9 text-xs text-slate-900 outline-none transition-colors focus:border-[#0b57d0] focus:bg-white"
+                  />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+                </div>
+                <p className="text-[11px] text-slate-400">
+                  Default: Receiver Email (<code className="text-slate-600">{emailTo || "Not set"}</code>)
+                </p>
+
+                <button
+                  type="button"
+                  onClick={handleSendTestEmail}
+                  disabled={isTestingEmail || (!emailUser && !testEmailTarget)}
+                  className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-xs font-bold text-white hover:bg-black transition-colors disabled:opacity-50 cursor-pointer shadow-xs"
+                >
+                  {isTestingEmail ? (
+                    <>
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      <span>Dispatching Test Email...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="h-3.5 w-3.5" />
+                      <span>Send Verification Test Email</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Quick Step Guide for Google App Password */}
+            <div className="rounded-3xl border border-blue-100 bg-gradient-to-br from-blue-50/60 to-indigo-50/40 p-6 shadow-xs space-y-4">
+              <div className="flex items-center gap-2.5 text-[#0b57d0]">
+                <HelpCircle className="h-4 w-4 shrink-0" />
+                <h4 className="text-xs font-extrabold uppercase tracking-wider">
+                  Google App Password Kaise Banayein?
+                </h4>
+              </div>
+
+              <ol className="space-y-2 text-xs text-slate-600 list-decimal list-inside leading-relaxed">
+                <li>
+                  Apne Gmail account me <strong>Google Account Settings &rarr; Security</strong> kholein.
+                </li>
+                <li>
+                  <strong>2-Step Verification</strong> ko <strong>ON</strong> karein (agar pehle se ON nahi hai).
+                </li>
+                <li>
+                  Search bar me <strong>&quot;App Passwords&quot;</strong> search karein ya Security page ke neeche scroll karein.
+                </li>
+                <li>
+                  App Name me <strong>&quot;AdiSofTech Portal&quot;</strong> daal kar <strong>Generate</strong> par click karein.
+                </li>
+                <li>
+                  Google dwara mila hua <strong>16-digit code</strong> copy karke yahan <strong>Google App Password</strong> me paste karein aur Save kar dein!
+                </li>
+              </ol>
+
+              <div className="pt-2 border-t border-blue-200/60 flex items-center justify-between text-[11px] text-blue-700 font-semibold">
+                <span>⚡ .env Auto-Update Active</span>
+                <span>Port 5000 Sync</span>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

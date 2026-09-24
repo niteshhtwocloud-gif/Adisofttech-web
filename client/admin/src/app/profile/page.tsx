@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { User, Shield, Mail, KeyRound, LogOut, CheckCircle2 } from "lucide-react";
+import { Shield, LogOut } from "lucide-react";
 import adminApi from "@/services/api";
 
 export default function AdminProfilePage() {
@@ -49,15 +49,7 @@ export default function AdminProfilePage() {
         </div>
 
         <div className="border-t border-slate-100 pt-6 flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <a
-              href="/settings"
-              className="inline-flex items-center gap-2 rounded-xl bg-[#0b57d0] px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-blue-700 transition-colors"
-            >
-              <KeyRound className="h-3.5 w-3.5" />
-              <span>Edit Profile &amp; Change Password</span>
-            </a>
-          </div>
+          <div />
 
           <button
             onClick={() => adminApi.logout()}

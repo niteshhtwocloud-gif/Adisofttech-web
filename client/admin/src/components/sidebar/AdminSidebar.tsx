@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
+  Images,
   FileText,
   Mail,
   Layers,
@@ -24,6 +25,7 @@ import adminApi from "@/services/api";
 // CMS navigation sidebar with active route highlighting and logout control.
 const NAV_ITEMS = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Hero Banners", href: "/hero-slider", icon: Images },
   { name: "All Blogs", href: "/blog", icon: FileText },
   { name: "Client Inquiries", href: "/contacts", icon: Mail },
   { name: "Services", href: "/services", icon: Layers },
@@ -105,11 +107,10 @@ export default function AdminSidebar({ isOpen = false, onClose }: AdminSidebarPr
                 key={item.name}
                 href={item.href}
                 onClick={() => isMobile && onClose?.()}
-                className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-xs font-semibold transition-all duration-150 ${
-                  isActive
+                className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-xs font-semibold transition-all duration-150 ${isActive
                     ? "bg-[#0b57d0] text-white shadow-sm shadow-blue-600/20"
                     : "text-slate-600 hover:bg-slate-100/80 hover:text-slate-900"
-                }`}
+                  }`}
               >
                 <Icon className={`h-4 w-4 shrink-0 ${isActive ? "text-white" : "text-slate-500"}`} />
                 <span>{item.name}</span>
